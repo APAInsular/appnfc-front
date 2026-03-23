@@ -1,11 +1,74 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+// src/pages/index.astro
+import '../styles/global.css';
+import Header from "../components/shared/Header.astro";
+import Footer from "../components/shared/Footer.astro";
+import ContentBlock from "../components/shared/ContentBlock.astro";
 
 
-// ? FigmaRef: https://www.figma.com/design/xoGckU9h6mwbcNK6Rd9Jii/APP-NFC?node-id=18-99&t=pfR3mc5yg1olrJMt-0
+// Texto Lorem Ipsum de ejemplo
+const textLorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
+// ✅ URLs de imágenes de Unsplash para pruebas rápidas
+const images = {
+    hero: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop", // Edificio de hospital moderno
+    project: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?q=80&w=1200&auto=format&fit=crop", // Sanitarios colaborando
+    wristband: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop" // Mano con wearable tecnológico (representando la pulsera)
+};
 ---
 
-<BaseLayout>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Q-Vida Care</title>
+</head>
+<body class="flex flex-col min-h-screen bg-white font-sans overflow-x-hidden">
 
-</BaseLayout>
+    <Header />
+
+    <section class="w-full">
+        <img 
+            src={images.hero} 
+            alt="Edificio Q-Vida" 
+            class="w-full h-[600px] object-cover"
+        />
+    </section>
+
+    <main class="w-full max-w-[1440px] mx-auto p-8 relative">
+        
+        <div class="absolute inset-0 w-full h-full -z-10 opacity-70">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <polygon points="0,0 70,0 20,100 0,100" fill="#f5f5f6" />
+                <polygon points="0,15 50,0 15,100 0,80" fill="#eeeeef" />
+            </svg>
+        </div>
+
+        <ContentBlock 
+            imageSrc={images.project} 
+            imageAlt="Sanitarios Q-Vida" 
+            title="Sobre el proyecto"
+        >
+            <p class="text-lg text-gray-700 leading-relaxed font-light">
+                {textLorem}
+            </p>
+        </ContentBlock>
+
+        <ContentBlock 
+            imageSrc={images.wristband} 
+            imageAlt="Mano con pulsera amarilla NFC" 
+            title="Las pulseras"
+            reverse={true} 
+        >
+            <p class="text-lg text-gray-700 leading-relaxed font-light">
+                {textLorem}
+            </p>
+        </ContentBlock>
+
+    </main>
+
+    <Footer />
+
+</body>
+</html>

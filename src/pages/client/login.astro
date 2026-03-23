@@ -1,7 +1,26 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-
-// ? FigmaRef: https://www.figma.com/design/xoGckU9h6mwbcNK6Rd9Jii/APP-NFC?node-id=28-116&t=pfR3mc5yg1olrJMt-0
+import ClientLayout from "../../layouts/ClientLayout.astro";
+import LoginForm from "../../components/forms/LoginForm";
 ---
-<BaseLayout>
-</BaseLayout>
+
+<ClientLayout title="Inicio de Sesión - Q-Vida Care">
+  <main class="min-h-screen flex items-center justify-center bg-white p-4">
+    <div class="flex flex-col items-center gap-20 w-full">
+      
+      <img
+        src="/img/Logo_Qvida.png"
+        alt="Q-Vida Care Logo"
+        class="w-full max-w-xl object-contain"
+      />
+
+      <LoginForm client:load />
+
+    </div>
+  </main>
+</ClientLayout>
+
+<style>
+  main {
+    font-family: 'Inter', sans-serif;
+  }
+</style>

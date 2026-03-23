@@ -1,8 +1,51 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-
-// ? FigmaRef: https://www.figma.com/design/xoGckU9h6mwbcNK6Rd9Jii/APP-NFC?node-id=28-135&t=pfR3mc5yg1olrJMt-0
-
+import ClientLayout from "../../layouts/ClientLayout.astro";
+import RegisterForm from "../../components/forms/RegisterForm";
 ---
-<BaseLayout>
-</BaseLayout>
+
+<ClientLayout title="Registro - Q-Vida Care">
+    <main class="min-h-screen flex items-center justify-center bg-white">
+        <div class="flex flex-col md:flex-row w-full overflow-hidden">
+            <div
+                class="flex flex-col md:flex-row w-full min-h-screen bg-white overflow-hidden relative"
+            >
+                <!-- Polígonos dentro de la tarjeta -->
+                <div class="absolute inset-0 pointer-events-none z-0">
+                    <div
+                        class="absolute top-0 right-[28%] w-[80%] h-full bg-gray-100 z-10"
+                        style="clip-path: polygon(35% 0%, 55% 0%, 20% 100%, 0% 100%);"
+                    >
+                    </div>
+                    <div
+                        class="absolute top-0 left-[-8%] w-[38%] h-full bg-gray-200"
+                        style="clip-path: polygon(0% 0%, 50% 0%, 100% 100%, 20% 100%);"
+                    >
+                    </div>
+                </div>
+
+                <div
+                    class="md:flex md:w-1/2 flex-col items-start justify-start p-4 pt-20 z-10"
+                >
+                    <img
+                        src="/img/Logo_Qvida.png"
+                        alt="Q-Vida Care Logo"
+                        class="w-auto max-w-md object-contain"
+                    />
+                </div>
+                <div class="w-full md:w-1/2 p-4 md:p-12 flex flex-col">
+                    <RegisterForm client:load />
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        main {
+            font-family: "Inter", sans-serif;
+        }
+
+        :global(#consent:checked + .checked-svg) {
+            opacity: 1;
+        }
+    </style></ClientLayout
+>
