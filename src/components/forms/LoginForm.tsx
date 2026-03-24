@@ -1,54 +1,67 @@
 // src/components/forms/LoginForm.tsx
 import { useState } from 'preact/hooks';
 
-export default function LoginForm() {
-  const [username, setUsername] = useState('');
+interface Props {
+  isAdmin?: boolean;
+}
+
+export default function LoginForm({ isAdmin = false }: Props) {
+  const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
-    console.log("Iniciando sesión con:", username, password);
-    // lógica de conexión al backend
-    window.location.href = "/client/profile";
+    
+    // Debug para ver en consola si el botón está vivo
+    console.log("Formulario enviado:", { user, password, isAdmin });
+
+    if (user && password) {
+      // ✅ Rutas actualizadas para que coincidan con tus archivos
+      const targetPath = isAdmin ? "/admin/metrics" : "/client/profile";
+      console.log("Redirigiendo a:", targetPath);
+      window.location.href = targetPath;
+    } else {
+      alert("Por favor, completa ambos campos.");
+    }
   };
 
-
-  const inputClass = "w-full bg-[#d0d0d1] border-none rounded-3xl py-3.5 px-6 placeholder-gray-600 focus:ring-2 focus:ring-teal-500 outline-none text-gray-800 font-medium";
+  const inputClass = "bg-[#d0d0d1] border-none rounded-2xl py-3 px-4 w-full text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-teal-500 outline-none transition-all text-center";
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-sm mx-auto">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-            
-            {/*Usuario */}
-            <input
-                type="text"
-                placeholder="Usuario"
-                value={username}
-                onInput={(e) => setUsername((e.target as HTMLInputElement).value)}
-                className={inputClass}
-            />
+    <div className="flex flex-col items-center w-full max-w-md mx-auto p-8 relative z-10">
+      <img src="/img/Logo_Qvida.png" alt="Logo" className="w-64 mb-12" />
 
-            {/* Contraseña */}
-            <input
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
-                className={inputClass}
-            />
+      <form onSubmit={handleSubmit} className="w-full space-y-4">
+        <input 
+          type="text" 
+          placeholder="Usuario" 
+          className={inputClass}
+          value={user}
+          required
+          onInput={(e) => setUser((e.currentTarget as HTMLInputElement).value)}
+        />
+        <input 
+          type="password" 
+          placeholder="Contraseña" 
+          className={inputClass}
+          value={password}
+          required
+          onInput={(e) => setPassword((e.currentTarget as HTMLInputElement).value)}
+        />
+        
+        <button 
+          type="submit" 
+          className="w-full bg-[#2eb0b0] text-white font-bold py-3 rounded-2xl shadow-lg hover:bg-[#269393] transition-all mt-4 active:scale-95"
+        >
+          Confirmar
+        </button>
+      </form>
 
-            {/* Botón */}
-            <div class="w-full flex justify-center mt-4">
-                <button type="submit" className="bg-[#2eb0b0] hover:bg-[#258f8f] text-white font-bold py-3.5 px-20 rounded-xl transition-all shadow-md">
-                    Confirmar
-                </button>
-            </div>
-        </form>
-
-        {/* Enlace a Registro */}
-        <a href="/client/register" className="text-center text-[#2eb0b0] font-medium hover:underline text-xl pt-2">
-            ¿No tienes sesión?, Registrarse
+      {!isAdmin && (
+        <a href="/client/register" className="mt-6 text-[#2eb0b0] hover:underline">
+          ¿No tienes sesión?, Registrarse
         </a>
+      )}
     </div>
   );
 }

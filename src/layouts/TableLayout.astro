@@ -1,0 +1,73 @@
+---
+// src/layouts/TableLayout.astro
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/shared/admin/Sidebar.astro';
+import { Icon } from 'astro-icon/components';
+
+const { pageTitle } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+// Estilos corregidos con 'class'
+const cellInputClass = "w-full bg-white border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-700 outline-none focus:ring-1 ring-[#2eb0b0]";
+const headerCellClass = "px-4 py-3 text-sm font-medium text-gray-600";
+---
+
+<BaseLayout title={`${pageTitle} - Q-Vida Admin`}>
+  <div class="flex min-h-screen bg-[#1c1c1c] font-sans">
+    
+    <Sidebar currentPath={currentPath} />
+
+    <main class="flex-1 bg-white  shadow-2xl flex flex-col overflow-hidden">
+      
+      <div class="px-8 pt-8 pb-4">
+        <h1 class="text-xl font-semibold text-gray-800">{pageTitle}</h1>
+      </div>
+
+      <div class="flex-grow overflow-auto px-0">
+        <table class="w-full border-collapse">
+          <thead class="bg-[#c4c4c4]">
+            <tr>
+              <th class={headerCellClass}></th> {/* Espacio para margen o ID */}
+              <th class={headerCellClass}>Field</th>
+              <th class={headerCellClass}>Field</th>
+              <th class={headerCellClass}>Surnames</th>
+              <th class={headerCellClass}>Name</th>
+              <th class="px-4 py-2 w-48">
+                <div class="relative">
+                  <input type="text" placeholder="Search" class="w-full bg-gray-100 rounded px-2 py-1 text-xs outline-none" />
+                </div>
+              </th>
+              <th class="w-24"></th> {/* Espacio para iconos finales */}
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-200">
+            {[1, 2, 3, 4].map((_) => (
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="p-4"></td>
+                <td class="p-2"><input type="text" class={cellInputClass} /></td>
+                <td class="p-2"><input type="text" class={cellInputClass} /></td>
+                <td class="p-2"><input type="text" class={cellInputClass} /></td>
+                <td class="p-2"><input type="text" class={cellInputClass} /></td>
+                <td class="p-2 text-right pr-8">
+                  <div class="flex justify-end gap-4 text-gray-600">
+                    <button class="hover:text-[#2eb0b0]">
+                      <Icon name="heroicons:pencil" class="w-6 h-6" />
+                    </button>
+                    <button class="hover:text-[#2eb0b0]">
+                      <Icon name="heroicons:book-open" class="w-6 h-6" />
+                    </button>
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
+
+    </main>
+  </div>
+</BaseLayout>

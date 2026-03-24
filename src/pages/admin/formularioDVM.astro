@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProfileForm from '../../components/forms/ProfileForm';
+---
+<BaseLayout title="Admin - Edición de Paciente">
+  <ProfileForm isAdmin={true} patientName="Carlos Santana" client:load />
+</BaseLayout>

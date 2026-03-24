@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "@astrojs/preact": "^5.0.2",
+    "@iconify-json/heroicons": "^1.2.3",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.0.8",
+    "astro-icon": "^1.1.5",
     "preact": "^10.29.0",
     "tailwindcss": "^4.2.2"
   }

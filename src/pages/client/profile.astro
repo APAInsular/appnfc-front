@@ -1,35 +1,9 @@
 ---
-import ClientLayout from "../../layouts/ClientLayout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProfileForm from "../../components/forms/ProfileForm";
 ---
 
-<ClientLayout title="Mis Datos - Q-Vida Care">
-  <main class="min-h-screen bg-white p-8 md:p-12 relative font-sans">
-    
-    <header class="flex justify-between items-center mb-12 relative">
-      <div class="flex-1"></div> <h1 class="text-4xl md:text-5xl font-light text-gray-800 text-center flex-1">
-        Mis datos
-      </h1>
+<BaseLayout title="Mis Datos - Q-Vida Care">
+  <ProfileForm client:load />
+</BaseLayout>
 
-      <div class="flex-1 flex justify-end">
-        <img 
-          src="/img/Logo_Qvida.png" 
-          alt="Logo Q-Vida" 
-          class="w-32 md:w-48 object-contain"
-        />
-      </div>
-    </header>
-
-    <section class="max-w-7xl mx-auto">
-      <ProfileForm client:load />
-    </section>
-
-  </main>
-</ClientLayout>
-
-<style>
- 
-  :global(.border-dashed) {
-    border-spacing: 15px;
-  }
-</style>
