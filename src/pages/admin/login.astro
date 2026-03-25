@@ -21,13 +21,13 @@ import LoginForm from "../../components/forms/LoginForm";
     </div>
 
 
-    <LoginForm client:load isAdmin={true} /> {/* Cambiar a false en client/login.astro */}
+    <LoginForm client:load isAdmin={true} /> 
 
   </div>
 </BaseLayout>
 
 <style>
-  /* Aseguramos que el cuerpo no tenga overflow que corte las formas */
+  
   :global(body) {
     overflow-x: hidden;
   }

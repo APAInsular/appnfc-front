@@ -7,19 +7,18 @@ interface Props {
 }
 
 export default function ProfileForm({ isAdmin = false, patientName = "Juan Pérez" }: Props) {
-  // --- ESTADOS ---
-  const [bloodType, setBloodType] = useState('O+'); // El valor se mostrará en el cuadro gris
+  const [bloodType, setBloodType] = useState('O+'); 
   const [allergies, setAllergies] = useState<string[]>(['']);
   const [meds, setMeds] = useState<string[]>(['']);
   const [devices, setDevices] = useState<string[]>(['']);
 
-  // Estados para contactos
+ 
   const [contact1, setContact1] = useState({ nombre: '', relacion: '', numero: '' });
   const [contact2, setContact2] = useState({ nombre: '', relacion: '', numero: '' });
 
   const title = isAdmin ? `Datos Vitales Mínimos ${patientName}` : "Mis datos";
 
-  // Estilos basados en tu diseño
+
   const inputClass = "bg-[#bcbcbc] border-none rounded-2xl py-3 px-4 w-full text-gray-800 placeholder-gray-600 outline-none shadow-inner";
   const labelBox = "bg-[#eeeeee] rounded-lg py-2 px-4 text-center text-sm font-semibold mb-2 shadow-sm text-gray-700";
   const selectorBox = "bg-[#d9d9d9] w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shadow-md transition-colors";
@@ -27,7 +26,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "Juan Pére
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-8 font-sans">
       
-      {/* --- ENCABEZADO: Título y Logo al mismo nivel --- */}
+
       <div className="flex justify-between items-center mb-16 relative min-h-[64px]">
         <div className="flex-1 text-center">
             <h1 className="text-4xl font-medium text-gray-800 tracking-tight">
@@ -41,10 +40,8 @@ export default function ProfileForm({ isAdmin = false, patientName = "Juan Pére
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
         
-        {/* --- COLUMNA 1: TIPO DE SANGRE Y EMERGENCIAS --- */}
+
         <div className="flex flex-col gap-8">
-          
-          {/* TIPO DE SANGRE: Ajustado según tu petición */}
           <div className="flex gap-3 items-center">
             <div className="bg-[#ff8a8a] text-white font-bold py-3 px-6 rounded-2xl flex-grow text-center text-lg shadow-md uppercase">
               Tipo de Sangre
@@ -67,7 +64,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "Juan Pére
             </div>
           </div>
 
-          {/* Emergencia 1 */}
+
           <div className="space-y-3">
             <div className={labelBox}>Contacto de Emergencia 1</div>
             <input 
@@ -93,7 +90,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "Juan Pére
             />
           </div>
 
-          {/* Emergencia 2 */}
+
           <div className="space-y-3">
             <div className={labelBox}>Contacto de Emergencia 2</div>
             <input 
@@ -120,7 +117,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "Juan Pére
           </div>
         </div>
 
-        {/* --- COLUMNAS MÉDICAS --- */}
+
         {[
           { title: 'Alergias', state: allergies, setter: setAllergies },
           { title: 'Medicaciones', state: meds, setter: setMeds },
@@ -151,7 +148,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "Juan Pére
         ))}
       </div>
 
-      {/* --- BOTÓN CONFIRMAR: SOLO PARA ADMIN --- */}
+
       {isAdmin && (
         <div className="flex justify-center mt-12">
             <button className="bg-[#2eb0b0] text-white text-xl font-medium py-4 px-24 rounded-2xl shadow-lg hover:bg-[#269393] transition-all">

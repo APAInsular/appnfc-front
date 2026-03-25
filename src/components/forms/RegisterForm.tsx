@@ -32,21 +32,21 @@ export default function RegisterForm() {
 
                 <input type="text" placeholder="Direccion" className={inputClass} />
 
-                {/*Contacto */}
+                
                 <div className="grid grid-cols-1 gap-3 pt-3">
                     <input type="tel" placeholder="Teléfono" className={inputClass} />
                     <input type="email" placeholder="Correo" className={inputClass} />
                     <input type="email" placeholder="Confirmar Correo" className={inputClass} />
                 </div>
 
-                {/* Contraseñas */}
+                
                 <div className="grid grid-cols-1 gap-3 pt-3">
                     <input type="password" placeholder="Contraseña" className={inputClass} />
                     <input type="password" placeholder="Confirmar Contraseña" className={inputClass} />
                 </div>
             </div>
 
-            {/* Consentimiento */}
+            
             <div className="flex items-center gap-4 mt-3">
                 <div class="relative flex items-center">
                     <input type="checkbox" id="consent" className="w-8 h-8 rounded-xl bg-[#d0d0d1] border-none text-teal-600 focus:ring-teal-500 cursor-pointer appearance-none checked:bg-teal-500" />
@@ -55,7 +55,7 @@ export default function RegisterForm() {
                 <label htmlFor="consent" className="text-gray-900 font-medium cursor-pointer">Consentimiento</label>
             </div>
 
-            {/* Botón */}
+            
             <div class="w-full flex justify-center mt-5">
                 <button type="submit" className="bg-[#2eb0b0] hover:bg-[#258f8f] text-white font-bold py-3 px-16 rounded-xl transition-all shadow-md">
                     Confirmar

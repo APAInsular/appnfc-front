@@ -12,11 +12,11 @@ export default function LoginForm({ isAdmin = false }: Props) {
   const handleSubmit = (e: Event) => {
     e.preventDefault();
     
-    // Debug para ver en consola si el botón está vivo
+ 
     console.log("Formulario enviado:", { user, password, isAdmin });
 
     if (user && password) {
-      // ✅ Rutas actualizadas para que coincidan con tus archivos
+
       const targetPath = isAdmin ? "/admin/metrics" : "/client/profile";
       console.log("Redirigiendo a:", targetPath);
       window.location.href = targetPath;

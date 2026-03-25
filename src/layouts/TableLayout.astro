@@ -7,7 +7,6 @@ import { Icon } from 'astro-icon/components';
 const { pageTitle } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-// Estilos corregidos con 'class'
 const cellInputClass = "w-full bg-white border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-700 outline-none focus:ring-1 ring-[#2eb0b0]";
 const headerCellClass = "px-4 py-3 text-sm font-medium text-gray-600";
 ---
@@ -27,7 +26,7 @@ const headerCellClass = "px-4 py-3 text-sm font-medium text-gray-600";
         <table class="w-full border-collapse">
           <thead class="bg-[#c4c4c4]">
             <tr>
-              <th class={headerCellClass}></th> {/* Espacio para margen o ID */}
+              <th class={headerCellClass}></th> 
               <th class={headerCellClass}>Field</th>
               <th class={headerCellClass}>Field</th>
               <th class={headerCellClass}>Surnames</th>
@@ -37,7 +36,7 @@ const headerCellClass = "px-4 py-3 text-sm font-medium text-gray-600";
                   <input type="text" placeholder="Search" class="w-full bg-gray-100 rounded px-2 py-1 text-xs outline-none" />
                 </div>
               </th>
-              <th class="w-24"></th> {/* Espacio para iconos finales */}
+              <th class="w-24"></th> 
             </tr>
           </thead>
 
