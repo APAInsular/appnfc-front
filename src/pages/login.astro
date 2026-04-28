@@ -1,6 +1,7 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import LoginForm from "../../components/forms/LoginForm";
+// src/pages/login.astro
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LoginForm from "../components/forms/LoginForm";
 ---
 
 <BaseLayout title="Inicio de Sesión - Q-Vida Care">
@@ -20,14 +21,11 @@ import LoginForm from "../../components/forms/LoginForm";
       </svg>
     </div>
 
-
-    <LoginForm client:load isAdmin={true} /> 
-
+    <LoginForm client:load />
   </div>
 </BaseLayout>
 
 <style>
-  
   :global(body) {
     overflow-x: hidden;
   }

@@ -1,12 +1,10 @@
 ---
 // src/components/shared/Header.astro
 const navLinks = [
-  { text: 'Panel Cliente', href: '/client/login' },
-  { text: 'Panel Administrador', href: '/admin/login' },
+  { text: 'Iniciar sesión', href: '/login' },
   { text: 'Sobre nosotros', href: '#sobre-nosotros' },
   { text: 'Contactenos', href: '#contact' },
   { text: 'Info Legal', href: '#legal' },
-  { text: 'Más', href: '#' },
 ];
 ---
 
@@ -18,7 +16,8 @@ const navLinks = [
     </a>
 
     <nav class="flex-grow flex justify-end items-center h-full">
-      <ul class="flex items-center gap-4 h-full py-4"> {navLinks.map((link) => (
+      <ul class="flex items-center gap-4 h-full py-4">
+        {navLinks.map((link) => (
           <li class="h-full">
             <a 
               href={link.href} 
@@ -35,6 +34,5 @@ const navLinks = [
         ))}
       </ul>
     </nav>
-
   </div>
 </header>
