@@ -14,7 +14,7 @@ export default function LoginForm() {
     }
 
     try {
-      const response = await fetch("https://www.limpora.xyz/apinfc/api/v1/auth/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,11 +25,20 @@ export default function LoginForm() {
         }),
       });
 
+      // if (!response.ok) {
+      //   throw new Error("Credenciales incorrectas");
+      // }
       if (!response.ok) {
+        const text = await response.text();
+        console.log("ERROR BACKEND:", text);
         throw new Error("Credenciales incorrectas");
       }
 
-      const response_json = await response.json();
+      const text = await response.text();
+      console.log("RESPUESTA RAW:", text);
+
+      const response_json = JSON.parse(text);
+      // const response_json = await response.json();
       console.log("Respuesta backend:", response_json);
 
       // 🔐 Token
@@ -38,8 +47,14 @@ export default function LoginForm() {
 
       // 👤 Usuario
       console.log(response_json);
-      
+
       const user = response_json?.data.user;
+      console.log("DEBUG - Usuario recibido:", user);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ⚠️ IMPORTANTE: Guardar ID y rol por separado para acceso rápido
+      localStorage.setItem("userId", user.uid); // o user.id según backend
+      localStorage.setItem("role", user.role);
 
       if (!user) {
         throw new Error("El backend no devolvió el usuario");
@@ -79,26 +94,26 @@ export default function LoginForm() {
       <img src="/img/Logo_Qvida.png" alt="Logo" className="w-64 mb-12" />
 
       <form onSubmit={handleSubmit} className="w-full space-y-4">
-        <input 
-          type="email" 
-          placeholder="Correo electrónico" 
+        <input
+          type="email"
+          placeholder="Correo electrónico"
           className={inputClass}
           value={email}
           required
           onInput={(e) => setEmail((e.currentTarget as HTMLInputElement).value)}
         />
 
-        <input 
-          type="password" 
-          placeholder="Contraseña" 
+        <input
+          type="password"
+          placeholder="Contraseña"
           className={inputClass}
           value={password}
           required
           onInput={(e) => setPassword((e.currentTarget as HTMLInputElement).value)}
         />
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           className="w-full bg-[#2eb0b0] text-white font-bold py-3 rounded-2xl shadow-lg hover:bg-[#269393] transition-all mt-4 active:scale-95"
         >
           Confirmar

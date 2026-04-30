@@ -1,52 +1,88 @@
 ---
-// src/components/admin/Sidebar.astro
-import { Icon } from 'astro-icon/components';
-import AddUserTrigger from '../../modals/AddUserTrigger'; 
+// src/components/shared/admin/Sidebar.astro
+import { Icon } from "astro-icon/components";
+import AddUserTrigger from "../../modals/AddUserTrigger";
+import LogoutButton from "../LogoutButton";
 
 const pathname = Astro.url.pathname;
 
 const menuItems = [
-  { name: 'Métricas', icon: 'heroicons:chart-bar', href: '/admin/metrics' },
-  { name: 'Incidencias', icon: 'heroicons:exclamation-circle', href: '/admin/incidencias' },
-  { name: 'Pulseras', icon: 'heroicons:hand-raised', href: '/admin/pulseras' },
-  { name: 'Usuarios', icon: 'heroicons:user-group', href: '/admin/usuarios' },
-  { name: 'Pacientes', icon: 'heroicons:users', href: '/admin/pacientes' },
-  { name: 'Clientes', icon: 'heroicons:plus-circle', href: '/admin/clientes' },
-  { name: 'Auditoría', icon: 'heroicons:magnifying-glass', href: '/admin/auditoria' },
+  { name: "Métricas", icon: "heroicons:chart-bar", href: "/admin/metrics" },
+  {
+    name: "Incidencias",
+    icon: "heroicons:exclamation-circle",
+    href: "/admin/incidencias",
+  },
+  { name: "Pulseras", icon: "heroicons:hand-raised", href: "/admin/pulseras" },
+  { name: "Usuarios", icon: "heroicons:user-group", href: "/admin/usuarios" },
+  { name: "Pacientes", icon: "heroicons:users", href: "/admin/pacientes" },
+  { name: "Clientes", icon: "heroicons:plus-circle", href: "/admin/clientes" },
+  {
+    name: "Auditoría",
+    icon: "heroicons:magnifying-glass",
+    href: "/admin/auditoria",
+  },
 ];
 ---
 
-<aside class="w-64 bg-[#2d2d2d] text-white min-h-screen flex flex-col p-5 shadow-2xl shrink-0">
+<aside
+  class="w-64 bg-[#2d2d2d] text-white min-h-screen flex flex-col p-5 shadow-2xl shrink-0"
+>
   <div class="flex items-center gap-3 mb-8 p-1">
-    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold">U</div>
+    <div
+      class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold"
+    >
+      U
+    </div>
     <span class="text-sm font-semibold">User</span>
-    <Icon name="heroicons:ellipsis-vertical" class="w-5 h-5 ml-auto text-gray-500" />
+    <Icon
+      name="heroicons:ellipsis-vertical"
+      class="w-5 h-5 ml-auto text-gray-500"
+    />
   </div>
 
   <div class="relative mb-6">
-    <input type="text" placeholder="Search" class="w-full bg-[#3d3d3d] rounded-lg py-2 px-3 text-xs text-gray-300 outline-none border border-transparent focus:border-[#2eb0b0]" />
-    <Icon name="heroicons:magnifying-glass" class="w-4 h-4 absolute right-3 top-2.5 text-gray-500" />
+    <input
+      type="text"
+      placeholder="Search"
+      class="w-full bg-[#3d3d3d] rounded-lg py-2 px-3 text-xs text-gray-300 outline-none border border-transparent focus:border-[#2eb0b0]"
+    />
+    <Icon
+      name="heroicons:magnifying-glass"
+      class="w-4 h-4 absolute right-3 top-2.5 text-gray-500"
+    />
   </div>
 
   <AddUserTrigger client:load />
 
   <nav class="flex-grow">
     <ul class="space-y-2">
-      {menuItems.map((item) => {
-        const isActive = pathname.startsWith(item.href);
-        return (
-          <li>
-            <a href={item.href} class={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-[#2eb0b0] text-white shadow-lg' : 'text-gray-400 hover:bg-[#383838] hover:text-gray-200'}`}>
-              <Icon name={item.icon} class="w-5 h-5" />
-              {item.name.toUpperCase()}
-            </a>
-          </li>
-        );
-      })}
+      {
+        menuItems.map((item) => {
+          const isActive = pathname.startsWith(item.href);
+          return (
+            <li>
+              <a
+                href={item.href}
+                class={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${isActive ? "bg-[#2eb0b0] text-white shadow-lg" : "text-gray-400 hover:bg-[#383838] hover:text-gray-200"}`}
+              >
+                <Icon name={item.icon} class="w-5 h-5" />
+                {item.name.toUpperCase()}
+              </a>
+            </li>
+          );
+        })
+      }
     </ul>
   </nav>
 
-  <div class="mt-auto pt-10 pb-4 flex justify-center">
-      <img src="/img/Logo_Qvida.png" alt="Logo" class="h-8 brightness-0 invert opacity-50" />
+  <div class="mt-auto pt-6 flex flex-col items-center gap-4">
+        <img
+      src="/img/Logo_Qvida.png"
+      alt="Logo"
+      class="h-8 brightness-0 invert opacity-50"
+    />
+    <LogoutButton client:load />
+
   </div>
 </aside>
