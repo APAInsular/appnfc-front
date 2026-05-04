@@ -1,33 +1,20 @@
-// src/pages/api/login.ts
+import type { APIRoute } from "astro";
 
-export const prerender = false;
+export const POST: APIRoute = async ({ request, cookies }) => {
+    const { email, password } = await request.json();
+    const res = await fetch(`${import.meta.env.API_URL}/api/v1/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+    });
+    const { data } = await res.json();
 
-export async function POST({ request }: { request: Request }) {
-  try {
-    const body = await request.json();
-
-    const response = await fetch("https://www.limpora.xyz/apinfc/api/v1/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+    cookies.set("auth-token", data.token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
     });
 
-    const text = await response.text(); // 👈 IMPORTANTE
-
-    return new Response(text, {
-      status: response.status,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-  } catch (error) {
-    console.error("Proxy error:", error);
-
-    return new Response(JSON.stringify({ error: "Error en proxy" }), {
-      status: 500,
-    });
-  }
-}
+    return new Response(JSON.stringify(data.user), { status: 200 });
+};
