@@ -1,6 +1,13 @@
 ---
 // src/pages/admin/usuarios.astro
 import TableLayout from '../../layouts/TableLayout.astro';
+import DynamicTable from '../../components/shared/admin/DynamicTable';
 ---
 
-<TableLayout pageTitle="Usuarios" />
+<TableLayout pageTitle="Gestión de Usuarios">
+  <DynamicTable 
+    client:load 
+    pageTitle="Listado de Usuarios"
+    endpoint="proxy/profiles"  
+  />
+</TableLayout>

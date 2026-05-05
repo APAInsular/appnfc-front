@@ -12,7 +12,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     const { profileType, id, data } = await request.json();
 
     const response = await fetch(
-        `${import.meta.env.API_URL}/api/v1/proxy/medplum/${profileType}/${id}`,
+        `${import.meta.env.API_URL}/proxy/medplum/${profileType}/${id}`,
         {
             method: "PUT",
             headers: {

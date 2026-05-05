@@ -3,7 +3,7 @@ export async function logout() {
 
   try {
     if (token) {
-      await fetch("https://www.limpora.xyz/apinfc/api/v1/auth/logout", {
+      await fetch("/api/logout", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
