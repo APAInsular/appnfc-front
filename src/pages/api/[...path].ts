@@ -1,50 +1,60 @@
-// src/pages/api/[...path].ts
 import type { APIRoute } from "astro";
 
 export const ALL: APIRoute = async ({ request, params, cookies }) => {
   const path = params.path;
-  
-  // 1. Buscamos el token en la cookie "auth-token" (como lo definiste en login.ts)
-  const tokenFromCookie = cookies.get("auth-token")?.value;
+  const token = cookies.get("auth-token")?.value || request.headers.get("Authorization");
 
-  // 2. Fallback: lo intentamos sacar del header (por si aún usas localStorage en algunas partes)
-  const tokenFromHeader = request.headers.get("Authorization");
-
-  // 3. Decidimos qué token usar
-  let finalAuthHeader = "";
-  if (tokenFromCookie) {
-      finalAuthHeader = `Bearer ${tokenFromCookie}`;
-  } else if (tokenFromHeader && tokenFromHeader !== "Bearer null") {
-      finalAuthHeader = tokenFromHeader;
+  if (!token || token === "Bearer null") {
+    return new Response(JSON.stringify({ message: "No autorizado" }), { status: 401 });
   }
 
-  // Si no hay token en ninguno de los dos lados, rechazamos
-  if (!finalAuthHeader) {
-    return new Response(JSON.stringify({ message: "No autorizado. Inicia sesión." }), { status: 401 });
-  }
+  const finalToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
 
+  // DEBUG: Mira esto en tu terminal negra de VS Code
   const backendUrl = `${import.meta.env.API_URL}/${path}`;
+  console.log(`🚀 PROXY FETCH: [${request.method}] -> ${backendUrl}`);
 
   try {
+    const headers: Record<string, string> = {
+      "Authorization": finalToken,
+      "Accept": "application/json",
+    };
+
+    let requestBody: any = undefined;
+
+    // SOLO leemos el cuerpo si NO es GET o HEAD
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      headers["Content-Type"] = "application/json";
+      const text = await request.text();
+      if (text) requestBody = text;
+    }
+
     const res = await fetch(backendUrl, {
       method: request.method,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": finalAuthHeader, // Mandamos el token real
-      },
-      body: request.method !== "GET" && request.method !== "HEAD" 
-            ? await request.text() 
-            : undefined,
+      headers: headers,
+      body: requestBody,
     });
 
-    const data = await res.json();
+    const responseText = await res.text();
+
+    if (!res.ok) {
+      console.log(`❌ ERROR DEL BACKEND EN ${path}:`);
+      console.log(responseText); 
+    }
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = { message: responseText };
+    }
 
     return new Response(JSON.stringify(data), {
       status: res.status,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error en Proxy:", error);
-    return new Response(JSON.stringify({ message: "Error conectando con el backend" }), { status: 500 });
+    console.error("❌ ERROR CRÍTICO PROXY:", error);
+    return new Response(JSON.stringify({ message: "Error conectando al backend" }), { status: 500 });
   }
 };

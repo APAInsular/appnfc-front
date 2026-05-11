@@ -1,13 +1,9 @@
 ---
 // src/pages/admin/pulseras.astro
 import TableLayout from '../../layouts/TableLayout.astro';
-import DynamicTable from '../../components/shared/admin/DynamicTable.tsx';
+import BraceletTable from '../../components/shared/admin/BraceletTable';
 ---
 
-<TableLayout pageTitle="Pulseras">
-  <DynamicTable 
-    client:load 
-    pageTitle="Listado de Pulseras"
-    endpoint="/bracelet" 
-  />
+<TableLayout pageTitle="Gestión de Pulseras">
+  <BraceletTable client:load pageTitle="Listado de Pulseras" />
 </TableLayout>
