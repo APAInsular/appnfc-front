@@ -1,13 +1,7 @@
 ---
 // src/pages/admin/clientes.astro
-import TableLayout from '../../layouts/TableLayout.astro';
-import DynamicTable from '../../components/shared/admin/DynamicTable';
+import ProviLayout from '../../layouts/ProviLayout.astro';
+// import DynamicTable from '../../components/shared/admin/DynamicTable';
 ---
 
-<TableLayout pageTitle="Gestión de Clientes">
-  <DynamicTable 
-    client:load 
-    pageTitle="Listado de Clientes"
-    endpoint="proxy/profiles"  
-  />
-</TableLayout>
+<ProviLayout pageTitle="Gestión de Clientes" />

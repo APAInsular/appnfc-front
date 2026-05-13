@@ -62,7 +62,7 @@ export default function BraceletTable({ pageTitle }: { pageTitle: string }) {
     const inputStyle = "w-full bg-white border border-gray-200 rounded-xl py-2 px-4 text-sm text-gray-700 outline-none shadow-sm read-only:bg-gray-50 cursor-default";
 
     return (
-        <div className="flex-1 bg-white shadow-lg flex flex-col overflow-hidden rounded-2xl border border-gray-200">
+        <div className="flex-1 bg-white shadow-lg flex flex-col overflow-hidden  border border-gray-200">
             {/* CABECERA */}
             <div className="bg-white px-6 py-5 border-b border-gray-100 flex justify-between items-center">
                 <div>

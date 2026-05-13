@@ -1,275 +1,166 @@
 // src/components/shared/admin/UserTable.tsx
 import { useState, useEffect } from 'preact/hooks';
 
+
 export default function UserTable() {
-    // Estados principales
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
     // Estados para el Modal de Edición
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [formData, setFormData] = useState({
         firstName: '',
-        lastName: '',
-        email: ''
+        surnames: '',
+        email: '',
+        role: ''
     });
 
     // --- CARGA DE DATOS ---
     const fetchAllUsers = async () => {
         try {
             setLoading(true);
-            setErrorMsg(null);
+            const res = await fetch('/api/account/');
+            if (!res.ok) throw new Error(`Error: ${res.status}`);
+            const json = await res.json();
 
-            // Cargamos Practitioner y Patient de forma independiente
-            const resPract = await fetch('/api/proxy/profiles/Practitioner');
-            const resPat = await fetch('/api/proxy/profiles/Patient');
-
-            // Logs de diagnóstico en caso de error 500
-            if (!resPract.ok) console.error(`Error Practitioner: ${resPract.status}`);
-            if (!resPat.ok) console.error(`Error Patient: ${resPat.status}`);
-
-            const dataPract = await resPract.json().catch(() => []);
-            const dataPat = await resPat.json().catch(() => []);
-
-            // Normalización de datos: Medplum a veces devuelve el array directo o dentro de .data
-            const listPract = Array.isArray(dataPract) ? dataPract : (dataPract.data || []);
-            const listPat = Array.isArray(dataPat) ? dataPat : (dataPat.data || []);
-
-            const combined = [...listPract, ...listPat];
-            setUsers(combined);
-
-            if (combined.length === 0) {
-                setErrorMsg("No se encontraron registros en el servidor.");
+            if (json.transformerData && Array.isArray(json.transformerData[0])) {
+                setUsers(json.transformerData[0]);
+            } else {
+                setUsers([]);
+                setErrorMsg("No se encontraron registros.");
             }
         } catch (err) {
-            console.error("Error fatal al obtener usuarios:", err);
-            setErrorMsg("Error de conexión o fallo en el servidor.");
+            setErrorMsg("Error al cargar datos.");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchAllUsers();
-    }, []);
+    useEffect(() => { fetchAllUsers(); }, []);
 
-    // --- LÓGICA DE EDICIÓN (PUT) ---
+    // --- LÓGICA DE EDICIÓN ---
     const openEditModal = (user: any) => {
         setCurrentUser(user);
-        const nameObj = user.name?.[0] || {};
-
-        // Buscamos el email en el array telecom de Medplum
-        const emailObj = user.telecom?.find((t: any) => t.system === 'email');
-
         setFormData({
-            firstName: nameObj.given?.join(' ') || '',
-            lastName: nameObj.family || '',
-            email: emailObj?.value || ''
+            firstName: user.firstName || '',
+            surnames: user.surnames || '',
+            email: user.email || '',
+            role: user.role || 'Patient'
         });
-        setIsModalOpen(true);
+        setIsEditModalOpen(true);
     };
 
     const handleUpdate = async () => {
         if (!currentUser) return;
+        const uuid = currentUser.uid;
+        // El resourceType para el proxy suele ser Patient o Practitioner
+        const type = currentUser.role === 'Practitioner' ? 'Practitioner' : 'Patient';
 
         try {
-            // 1. CREAMOS UN PAYLOAD LIMPIO
-            // Extraemos 'meta' para NO enviarlo, ya que el servidor lo genera solo
-            const { meta, ...cleanUser } = currentUser;
-
-            const payload = {
-                ...cleanUser,
-                id: currentUser.id, // Aseguramos el ID en la raíz
-                resourceType: currentUser.resourceType,
-                name: [
-                    {
-                        given: [formData.firstName],
-                        family: formData.lastName
-                    }
-                ],
-                telecom: [
-                    {
-                        system: 'email',
-                        value: formData.email,
-                        use: 'work'
-                    }
-                ]
-            };
-
-            console.log("🚀 ENVIANDO PAYLOAD LIMPIO:", payload);
-
-            const response = await fetch(`/api/proxy/profiles/${currentUser.resourceType}/${currentUser.id}`, {
+            const response = await fetch(`/api/proxy/profiles/${type}/${uuid}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...formData,
+                    id: uuid // Medplum suele requerir el ID en el body también
+                })
             });
 
-            const result = await response.json();
-
             if (response.ok) {
-                alert("¡Usuario actualizado!");
-                setIsModalOpen(false);
-                fetchAllUsers();
+                alert("Usuario actualizado correctamente");
+                setIsEditModalOpen(false);
+                fetchAllUsers(); // Recarga la lista
             } else {
-                // Aquí capturamos el error exacto que te está dando el 500
-                console.error("❌ Error del servidor:", result);
-                alert(`Error: ${result.message || 'Error interno'}`);
+                alert("Error al actualizar");
             }
         } catch (error) {
-            console.error("❌ Error en la conexión:", error);
+            console.error("Error:", error);
         }
     };
 
-    // --- LÓGICA DE ELIMINACIÓN (DELETE) ---
+    // --- LÓGICA DE ELIMINACIÓN ---
     const handleDelete = async (user: any) => {
-        const pType = user.resourceType;
-        const pId = user.id;
-
-        if (!confirm(`¿Estás seguro de eliminar a este ${pType}?`)) return;
-
+        if (!confirm(`¿Estás seguro de eliminar a ${user.firstName}?`)) return;
+        
+        const type = user.role === 'Practitioner' ? 'Practitioner' : 'Patient';
         try {
-            const response = await fetch(`/api/proxy/profiles/${pType}/${pId}`, {
+            const response = await fetch(`/api/proxy/profiles/${type}/${user.uid}`, {
                 method: 'DELETE'
             });
 
             if (response.ok) {
                 alert("Eliminado con éxito");
-                setUsers(prev => prev.filter(u => u.id !== pId));
-            } else {
-                const errorData = await response.json().catch(() => ({}));
-                alert(`Error al eliminar: ${errorData.message || 'Consulte al administrador'}`);
+                setUsers(prev => prev.filter(u => u.uid !== user.uid));
             }
         } catch (error) {
-            console.error("Error en la petición DELETE:", error);
+            console.error("Error:", error);
         }
     };
 
-    const inputStyle = "w-full bg-white border border-gray-300 rounded-xl py-2 px-4 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all";
-
     return (
-        <div className="flex-1 bg-white shadow-lg flex flex-col overflow-hidden relative min-h-[400px]">
-            {/* Header */}
-            <div className="bg-[#f0f0f0] px-6 py-4 border-b border-gray-300">
-                <h1 className="text-xl font-medium text-gray-800">Gestión de Usuarios</h1>
+        <div className="flex-1 bg-white shadow-lg flex flex-col overflow-hidden min-h-[400px]">
+            <div className="bg-[#f8f9fa] px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h1 className="text-xl font-bold text-gray-800">Gestión de Usuarios</h1>
+                <div className="flex gap-4">
+                    <button onClick={fetchAllUsers} className="text-sm text-blue-600 hover:underline">🔄 Refrescar</button>
+                </div>
             </div>
 
-            {/* Cabecera de Tabla */}
-            <div className="bg-gray-100 px-4 py-3 grid grid-cols-12 gap-x-6 text-xs font-bold text-gray-600 uppercase">
-                <div className="col-span-3">ID / UUID</div>
-                <div className="col-span-2">Tipo</div>
-                <div className="col-span-4">Nombre Completo</div>
-                <div className="col-span-3 text-right">Acciones</div>
+            {/* Cabecera Tabla */}
+            <div className="bg-gray-100 px-6 py-3 grid grid-cols-12 gap-x-6 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b">
+                <div className="col-span-4">UUID / IDENTIFICADOR</div>
+                <div className="col-span-2">ROL</div>
+                <div className="col-span-4">NOMBRE COMPLETO</div>
+                <div className="col-span-2 text-right">ACCIONES</div>
             </div>
 
-            {/* Cuerpo de Tabla */}
-            <div className="flex-grow overflow-auto p-2 space-y-2">
+            <div className="flex-grow overflow-auto p-2 space-y-2 bg-gray-50/30">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center p-20 space-y-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <p className="text-gray-500 italic">Sincronizando con Medplum...</p>
-                    </div>
-                ) : users.length === 0 ? (
-                    <div className="p-20 text-center">
-                        <p className="text-gray-400 font-medium">{errorMsg || "No hay usuarios registrados."}</p>
-                    </div>
+                    <div className="flex justify-center p-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>
                 ) : (
-                    users.map((user, idx) => {
-                        const nameObj = user.name?.[0] || {};
-                        const fullName = `${nameObj.given?.join(' ') || ''} ${nameObj.family || ''}`.trim() || 'Sin nombre';
-                        const type = user.resourceType;
-
-                        return (
-                            <div key={user.id || idx} className="bg-white border border-gray-100 grid grid-cols-12 gap-x-6 items-center py-3 px-4 rounded-xl hover:bg-gray-50 transition-colors">
-                                <div className="col-span-3 flex items-center gap-2">
-                                    <span className="font-mono text-[12px] bg-gray-100 px-2 py-1 rounded border border-gray-200 text-gray-600 truncate max-w-[120px]">
-                                        {user.id}
-                                    </span>
-                                    <button
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(user.id);
-                                            alert("ID Copiado al portapapeles");
-                                        }}
-                                        className="text-[12px] bg-white border border-gray-300 px-1.5 py-0.5 rounded hover:bg-gray-50 active:scale-90 transition-all"
-                                        title="Copiar ID completo"
-                                    >
-                                        📋
-                                    </button>
-                                </div>
-                                <div className="col-span-2">
-                                    <span className={`text-[12px] font-bold uppercase px-2 py-0.5 rounded-full ${type === 'Practitioner' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                                        {type}
-                                    </span>
-                                </div>
-                                <div className="col-span-4 text-sm text-gray-700 font-medium truncate">
-                                    {fullName}
-                                </div>
-                                <div className="col-span-3 flex justify-end gap-2">
-                                    <button onClick={() => openEditModal(user)} className="p-2 border border-gray-200 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-all">✏️</button>
-                                    <button onClick={() => handleDelete(user)} className="p-2 border border-red-100 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all">🗑️</button>
-                                </div>
+                    users.map((user) => (
+                        <div key={user.uid} className="bg-white border border-gray-100 grid grid-cols-12 gap-x-6 items-center py-3 px-6 rounded-xl hover:shadow-sm transition-all">
+                            <div className="col-span-4 flex items-center gap-2">
+                                <span className="font-mono text-[11px] bg-gray-50 px-2 py-1 rounded border border-gray-200 text-gray-600 truncate max-w-[180px]">
+                                    {user.uid}
+                                </span>
+                                <button onClick={() => { navigator.clipboard.writeText(user.uid); alert("Copiado"); }} className="p-1 hover:bg-gray-100 rounded">📋</button>
                             </div>
-                        );
-                    })
+                            <div className="col-span-2">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${user.role === 'Practitioner' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                                    {(user.role || 'USER').toUpperCase()}
+                                </span>
+                            </div>
+                            <div className="col-span-4 text-sm font-medium text-gray-700">
+                                {`${user.firstName || ''} ${user.surnames || ''}`}
+                            </div>
+                            <div className="col-span-2 flex justify-end gap-2">
+                                <button onClick={() => openEditModal(user)} className="p-2 text-gray-400 hover:text-blue-600 transition-colors">✏️</button>
+                                <button onClick={() => handleDelete(user)} className="p-2 text-gray-400 hover:text-red-500 transition-colors">🗑️</button>
+                            </div>
+                        </div>
+                    ))
                 )}
             </div>
 
-            {/* MODAL DE EDICIÓN */}
-            {isModalOpen && (
+            {/* Modal de Edición */}
+            {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
                         <div className="bg-gray-50 px-8 py-6 border-b">
                             <h3 className="text-xl font-bold text-gray-800">Editar Perfil</h3>
-                            <p className="text-xs text-gray-500 uppercase mt-1 tracking-wider">{currentUser?.resourceType} ID: {currentUser?.id?.split('-')[0]}</p>
                         </div>
-
-                        <div className="p-8 space-y-5">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Nombre(s)</label>
-                                <input
-                                    type="text"
-                                    className={inputStyle}
-                                    value={formData.firstName}
-                                    onInput={(e) => setFormData({ ...formData, firstName: e.currentTarget.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Apellido(s)</label>
-                                <input
-                                    type="text"
-                                    className={inputStyle}
-                                    value={formData.lastName}
-                                    onInput={(e) => setFormData({ ...formData, lastName: e.currentTarget.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Correo Electrónico</label>
-                                <input
-                                    type="email"
-                                    className={inputStyle}
-                                    value={formData.email}
-                                    onInput={(e) => setFormData({ ...formData, email: e.currentTarget.value })}
-                                />
-                            </div>
+                        <div className="p-8 space-y-4">
+                            <input type="text" placeholder="Nombre" className="w-full border rounded-xl py-2 px-4" value={formData.firstName} onInput={(e) => setFormData({ ...formData, firstName: e.currentTarget.value })} />
+                            <input type="text" placeholder="Apellidos" className="w-full border rounded-xl py-2 px-4" value={formData.surnames} onInput={(e) => setFormData({ ...formData, surnames: e.currentTarget.value })} />
+                            <input type="email" placeholder="Email" className="w-full border rounded-xl py-2 px-4" value={formData.email} onInput={(e) => setFormData({ ...formData, email: e.currentTarget.value })} />
                         </div>
-
-                        <div className="bg-gray-50 px-8 py-5 flex justify-end gap-3">
-                            <button
-                                onClick={() => setIsModalOpen(false)}
-                                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleUpdate}
-                                className="px-8 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md shadow-blue-200 transition-all active:scale-95"
-                            >
-                                Guardar Cambios
-                            </button>
+                        <div className="bg-gray-50 px-8 py-4 flex justify-end gap-3">
+                            <button onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-sm text-gray-500">Cancelar</button>
+                            <button onClick={handleUpdate} className="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold">Guardar Cambios</button>
                         </div>
                     </div>
                 </div>

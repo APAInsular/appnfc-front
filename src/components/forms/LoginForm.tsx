@@ -26,8 +26,21 @@ export default function LoginForm() {
         }
 
         const user = await res.json();
+        
+
+        // --- LA SOLUCIÓN ESTÁ AQUÍ ---
+        // 1. Guardamos el token explícitamente para que ProfileForm lo encuentre
+        // if (user.token) {
+        //     localStorage.setItem("token", user.token);
+        //     console.log("Token guardado correctamente en LocalStorage");
+        // } else {
+        //     console.error("El backend no ha enviado un campo 'token' en el JSON");
+        // }
+
+        // 2. Ejecutamos tu lógica actual del store
         login(user);
 
+        // 3. Redirigimos
         const route = ROLE_ROUTES[user.role];
         if (route) window.location.href = route;
     };

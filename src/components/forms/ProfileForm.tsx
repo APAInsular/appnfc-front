@@ -1,341 +1,330 @@
 // src/components/forms/ProfileForm.tsx
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import LogoutButton from '../shared/LogoutButton';
 
-interface Props {
-  isAdmin?: boolean;
-  patientName?: string;
-}
+export default function ProfileForm({ isAdmin = false, patientName = "" }) {
+  const [loading, setLoading] = useState(true);
 
-export default function ProfileForm({ isAdmin = false, patientName = "Juan Pérez" }: Props) {
-  // --- ESTADOS: Datos Personales ---
-  const [personalData, setPersonalData] = useState({
-    nombre: 'Juan', apellido1: 'Pérez', apellido2: 'Gómez', idioma: 'Español', sexo: 'Masculino', sangre: 'O+'
+  // --- ESTADO INICIAL (Ajustado a los Enums y Strings que pide tu servidor) ---
+  const [formData, setFormData] = useState({
+    firstName: '',
+    surname1: '', // Apellido 1
+    surname2: '', // Apellido 2
+    language: 'ES',
+    biologicalSex: 'M',
+    bloodType: 'O+',   // "O+", "O-", etc.
+    allergies: [] as string[],
+    medications: [] as string[],
+    pathologies: [] as string[],
+    inplantDevices: [] as string[],
+    neurologicalStatus: [] as string[],
+    emergencyContacts: [
+      { nombre: '', vinculo: '', telefono: '' },
+      { nombre: '', vinculo: '', telefono: '' }
+    ]
   });
 
-  // --- ESTADOS: Contactos ---
-  const [contacts, setContacts] = useState([
-    { nombre: '', vinculo: '', telefono: '' },
-    { nombre: '', vinculo: '', telefono: '' }
-  ]);
+  // --- CARGA DE DATOS (GET /api/v1/me) ---
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/me');
+        if (response.ok) {
+          const data = await response.json();
 
-  // --- ESTADOS: Checkboxes Médicos ---
-  const [alergias, setAlergias] = useState({ ninguna: false, especificas: '' });
+          const patientName = data.profile?.name?.[0] || {};
+          const firstName = patientName.given?.[0] || '';
 
-  const [medicamentos, setMedicamentos] = useState({
-    ninguna: false, anticoagulantes: false, insulina: false, opioides: false,
-    hipoglucemiantes: false, benzodiazepina: false, antiepilepticos: false, cortisonicos: false, otros: ''
-  });
+          // --- SEPARACIÓN DE APELLIDOS ---
+          const fullFamily = patientName.family || ''; // "cum be"
+          const familyParts = fullFamily.trim().split(/\s+/); // Divide por espacios
+          const s1 = familyParts[0] || '';
+          const s2 = familyParts.slice(1).join(' ') || ''; // Maneja apellidos compuestos
 
-  const [patologias, setPatologias] = useState({
-    cardiopatia: false, diabetes: false, diabetesTipo1: false, diabetesTipo2: false,
-    asma: false, epoc: false, insuficienciaRenal: false, trastornosCoagulacion: false,
-    trasplantes: false, inmunodepresion: false, otro: ''
-  });
+          const gender = data.profile?.gender === 'male' ? 'M' : 'F';
+          const allCodes: string[] = (data.conditions || []).map((cond: any) =>
+            cond.code?.coding?.[0]?.code
+          ).filter(Boolean);
 
-  const [dispositivos, setDispositivos] = useState({
-    marcapasos: false, dai: false, protesisValvular: false, derivacionVentricular: false,
-    dialisis: false, otro: ''
-  });
+          const bloodTypeExtension = data.profile?.extension?.find(
+            (ext: any) => ext.url === "http://hl7.org/fhir/StructureDefinition/patient-bloodType"
+          );
+          const serverBloodType = bloodTypeExtension?.valueCodeableConcept?.coding?.[0]?.code;
 
-  const [estadoNeuro, setEstadoNeuro] = useState({
-    brillante: false, confusion: false, deficits: false, autonomo: false,
-    parcialmenteDependiente: false, noAutonomo: false
-  });
 
-  const title = isAdmin ? `Datos del Paciente: ${patientName}` : "Mis Datos Médicos";
+          setFormData(prev => ({
+            ...prev,
+            firstName: firstName,
+            surname1: s1,
+            surname2: s2,
+            language: 'ES',
+            biologicalSex: gender,
+            // Si el backend no envía el tipo de sangre aún, lo forzamos a O+ 
+            // o lo leemos si sabes dónde viene (ej: data.profile.bloodType)
+            bloodType: serverBloodType || 'O+',
+            allergies: allCodes,
+            medications: allCodes,
+            pathologies: allCodes,
+            inplantDevices: allCodes,
+            neurologicalStatus: allCodes,
+            emergencyContacts: prev.emergencyContacts
+          }));
+        }
+      } catch (err) {
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
 
-  // --- CLASES CSS REUTILIZABLES ---
-  const inputClass = "bg-[#bcbcbc]/20 border border-gray-300 rounded-xl py-2.5 px-4 w-full text-gray-800 placeholder-gray-500 outline-none focus:border-[#2eb0b0] transition-colors disabled:opacity-60 disabled:bg-gray-100 disabled:cursor-not-allowed";
-  const sectionTitle = "bg-[#eeeeee] rounded-lg py-2 px-4 text-center text-xs font-bold mb-4 shadow-sm text-gray-600 uppercase tracking-widest";
-  const cardClass = "bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col h-full";
-
-  // Componente interno para renderizar checkboxes
-  const Checkbox = ({ label, checked, onChange }: { label: string, checked: boolean, onChange: (val: boolean) => void }) => (
-    <label className={`flex items-center space-x-3 ${isAdmin ? 'cursor-not-allowed opacity-80' : 'cursor-pointer group'}`}>
-      <div className={`w-5 h-5 rounded flex-shrink-0 flex items-center justify-center border-2 transition-colors ${checked ? 'bg-[#2eb0b0] border-[#2eb0b0]' : 'border-gray-400 bg-white group-hover:border-[#2eb0b0]'}`}>
-        {checked && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
-      </div>
-      <span className="text-gray-700 text-xs font-semibold uppercase">{label}</span>
-      <input type="checkbox" className="hidden" checked={checked} onChange={(e) => !isAdmin && onChange(e.currentTarget.checked)} disabled={isAdmin} />
-    </label>
-  );
-
-const handleSave = async () => {
-    // 1. Depuración: Ver qué hay en el localStorage
+  const handleSave = async () => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-    const role = localStorage.getItem("role");
 
-    console.log("DEBUG - Datos recuperados:", { token, userId, role });
+    // Listas de referencia según tu documentación técnica
+    const validAllergies = ["442557003"];
+    const validMedications = ["260413007", "418427003", "31252001", "373264003", "387207008", "387158006", "386452003", "387081005"];
+    const validPathologies = ["160245001", "49436004", "73211009", "195967001", "13645005", "709044004", "64770001", "161661002", "370388006"];
+    const validImplants = ["260413007", "14106009", "441509002", "17137000", "271295000", "700448003"];
+    const validNeuro = ["40739000", "706868007", "128294001", "365061000", "371153006", "129839007"];
 
-    // 2. Validación defensiva
-    if (!token) {
-      alert("Error: No tienes un token de sesión. Inicia sesión de nuevo.");
-      return;
-    }
-    
-    if (!userId) {
-      alert("Error: No se encontró el ID de usuario. Revisa el localStorage.");
-      return;
-    }
+    // Creamos el objeto limpio
+    const dataToSend = {
+      firstName: formData.firstName,
+      surnames: `${formData.surname1} ${formData.surname2}`.trim(),
+      language: formData.language,
+      biologicalSex: formData.biologicalSex,
+      bloodType: formData.bloodType,
+      // Filtramos cada array para que solo lleve lo que el servidor espera en esa sección
+      allergies: formData.allergies.filter(code => validAllergies.includes(code)),
+      medications: formData.medications.filter(code => validMedications.includes(code)),
+      pathologies: formData.pathologies.filter(code => validPathologies.includes(code)),
+      inplantDevices: formData.inplantDevices.filter(code => validImplants.includes(code)),
+      neurologicalStatus: formData.neurologicalStatus.filter(code => validNeuro.includes(code)),
+      emergencyContacts: formData.emergencyContacts
+    };
 
     try {
-      const payload = {
-        personalData,
-        contacts,
-        alergias,
-        medicamentos,
-        patologias,
-        dispositivos,
-        estadoNeuro,
-      };
-
-      const response = await fetch("/api/updateProfile", {
+      const response = await fetch("/api/me", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Aseguramos el formato Bearer
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({
-          profileType: role === "Patient" ? "Patient" : "Practitioner",
-          id: userId,
-          data: payload,
-        }),
+        body: JSON.stringify(dataToSend),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Servidor respondió: ${errorText}`);
+      if (response.ok) {
+        alert("✅ Ficha médica actualizada con éxito");
+      } else {
+        const errorMsg = await response.json();
+        console.error("Error detallado:", errorMsg);
+        alert(`❌ Error del servidor: ${errorMsg.message}`);
       }
-
-      alert("✅ Datos guardados correctamente");
-
     } catch (error) {
-      console.error("ERROR EN GUARDADO:", error);
-      alert("❌ Error al guardar. Revisa la consola para más detalles.");
+      alert("❌ Error de conexión");
     }
   };
+
+
+
+  // --- LÓGICA DE CHECKBOXES (Mantenemos la funcionalidad pero con Strings) ---
+  const toggleSnomed = (category: keyof typeof formData, code: string) => {
+    if (isAdmin) return;
+    setFormData(prev => {
+      const current = prev[category] as string[];
+      const noneCodes = ["260413007", "442557003", "160245001"];
+
+      if (noneCodes.includes(code)) return { ...prev, [category]: [code] };
+
+      const filtered = current.filter(c => !noneCodes.includes(c));
+      return {
+        ...prev,
+        [category]: current.includes(code) ? filtered.filter(c => c !== code) : [...filtered, code]
+      };
+    });
+  };
+
+  const Checkbox = ({ category, code, label }: { category: keyof typeof formData, code: string, label: string }) => {
+    const isChecked = (formData[category] as string[]).includes(code);
+    return (
+      <label className="flex items-center space-x-3 mb-2 cursor-pointer group">
+        <div className={`w-5 h-5 rounded border-2 transition-colors flex items-center justify-center ${isChecked ? 'bg-[#2eb0b0] border-[#2eb0b0]' : 'border-gray-400 bg-white group-hover:border-[#2eb0b0]'}`}>
+          {isChecked && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
+        </div>
+        <span className="text-gray-700 text-[11px] font-semibold uppercase">{label}</span>
+        <input type="checkbox" className="hidden" onChange={() => toggleSnomed(category, code)} />
+      </label>
+    );
+  };
+
+  const sectionTitle = "bg-[#eeeeee] rounded-lg py-2 px-4 text-center text-[10px] font-bold mb-4 text-gray-600 uppercase tracking-widest";
+  const cardClass = "bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col h-full";
+  const inputClass = "bg-[#bcbcbc]/20 border border-gray-300 rounded-xl py-2 px-4 w-full text-gray-800 text-xs outline-none focus:border-[#2eb0b0]";
+
+  if (loading) return <div className="h-screen flex items-center justify-center text-[#2eb0b0] font-bold">Cargando perfil...</div>;
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8 font-sans pb-20">
 
       {/* CABECERA */}
-      <div className="flex justify-between items-center mb-10 border-b pb-6">
-        <div>
-          <p className="text-[#2eb0b0] font-bold text-sm uppercase tracking-widest mb-1">
-            {isAdmin ? "Modo Lectura" : "Formulario de Autodeterminación"}
-          </p>
-          <h1 className="text-3xl font-medium text-gray-800 uppercase">{title}</h1>
-        </div>
-
+      <div className="flex justify-between items-center mb-6 border-b pb-6">
+        <h1 className="text-2xl font-bold text-gray-800 uppercase">Mi Ficha Médica</h1>
         <div className="flex items-center gap-4">
-          <img src="/img/Logo_Qvida.png" alt="Logo Q-Vida" className="h-12" />
+          <img src="/img/Logo_Qvida.png" alt="Logo" className="h-10" />
           <LogoutButton />
         </div>
       </div>
 
-      {/* 0. AVISO LEGAL [cite: 60-64] */}
-      {!isAdmin && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-8 text-xs text-blue-800 text-justify leading-relaxed">
-          <strong>Advertencia legal:</strong> La presente declaración expresa mi voluntad en el ámbito sanitario y está redactada en forma de autodeterminación personal. Soy consciente de que, conforme al artículo 11 de la Ley 41/2002, las Instrucciones Previas solo adquieren plena eficacia jurídica si se formalizan según la normativa y se inscriben en el Registro oficial. Por tanto, este documento no constituye una directiva anticipada jurídicamente vinculante. No obstante, de conformidad con el artículo 9 del Convenio de Oviedo, los deseos previamente expresados deberán ser tenidos en cuenta.
-        </div>
-      )}
-
-      {/* GRID PRINCIPAL */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        {/* COLUMNA 1 */}
-        <div className="space-y-6 flex flex-col">
-          {/* 1. ALERGIAS [cite: 1] */}
-          <div className={cardClass}>
-            <div className={sectionTitle}>Alergias</div>
-            <div className="space-y-4">
-              <Checkbox label="Ninguna" checked={alergias.ninguna} onChange={v => setAlergias({ ...alergias, ninguna: v })} />
-              {!alergias.ninguna && (
-                <textarea placeholder="Especifique sus alergias aquí..." rows={3} className={`${inputClass} resize-none`} value={alergias.especificas} onChange={e => setAlergias({ ...alergias, especificas: e.currentTarget.value })} disabled={isAdmin}></textarea>
-              )}
-            </div>
-          </div>
-
-          {/* 4. DISPOSITIVOS DE IMPLANTE [cite: 38-47] */}
-          <div className={cardClass}>
-            <div className={sectionTitle}>Dispositivos de Implante</div>
-            <div className="space-y-4">
-              <Checkbox label="Ninguno" checked={dispositivos.marcapasos === false && dispositivos.dai === false && dispositivos.protesisValvular === false && dispositivos.derivacionVentricular === false && dispositivos.dialisis === false && dispositivos.otro === ''} onChange={() => setDispositivos({ marcapasos: false, dai: false, protesisValvular: false, derivacionVentricular: false, dialisis: false, otro: '' })} />
-              <Checkbox label="Marcapasos" checked={dispositivos.marcapasos} onChange={v => setDispositivos({ ...dispositivos, marcapasos: v })} />
-              <Checkbox label="DAI" checked={dispositivos.dai} onChange={v => setDispositivos({ ...dispositivos, dai: v })} />
-              <Checkbox label="Prótesis Valvular" checked={dispositivos.protesisValvular} onChange={v => setDispositivos({ ...dispositivos, protesisValvular: v })} />
-              <Checkbox label="Derivación Ventricular" checked={dispositivos.derivacionVentricular} onChange={v => setDispositivos({ ...dispositivos, derivacionVentricular: v })} />
-              <Checkbox label="Diálisis" checked={dispositivos.dialisis} onChange={v => setDispositivos({ ...dispositivos, dialisis: v })} />
-              <input type="text" placeholder="Otro dispositivo..." className={inputClass} value={dispositivos.otro} onChange={e => setDispositivos({ ...dispositivos, otro: e.currentTarget.value })} disabled={isAdmin} />
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMNA 2 */}
-        <div className="space-y-6 flex flex-col">
-          {/* 2. MEDICAMENTOS EN PROGRESO [cite: 2-16] */}
-          <div className={cardClass}>
-            <div className={sectionTitle}>Medicamentos en Progreso</div>
-            <div className="space-y-4">
-              <Checkbox label="Ninguno" checked={medicamentos.ninguna} onChange={v => setMedicamentos({ ...medicamentos, ninguna: v })} />
-              {!medicamentos.ninguna && (
-                <>
-                  <Checkbox label="Anticoagulantes" checked={medicamentos.anticoagulantes} onChange={v => setMedicamentos({ ...medicamentos, anticoagulantes: v })} />
-                  <Checkbox label="Insulina" checked={medicamentos.insulina} onChange={v => setMedicamentos({ ...medicamentos, insulina: v })} />
-                  <Checkbox label="Opioides" checked={medicamentos.opioides} onChange={v => setMedicamentos({ ...medicamentos, opioides: v })} />
-                  <Checkbox label="Hipoglucemiantes Orales" checked={medicamentos.hipoglucemiantes} onChange={v => setMedicamentos({ ...medicamentos, hipoglucemiantes: v })} />
-                  <Checkbox label="Benzodiazepina" checked={medicamentos.benzodiazepina} onChange={v => setMedicamentos({ ...medicamentos, benzodiazepina: v })} />
-                  <Checkbox label="Antiepilépticos" checked={medicamentos.antiepilepticos} onChange={v => setMedicamentos({ ...medicamentos, antiepilepticos: v })} />
-                  <Checkbox label="Cortisónicos" checked={medicamentos.cortisonicos} onChange={v => setMedicamentos({ ...medicamentos, cortisonicos: v })} />
-                  <input type="text" placeholder="Otros medicamentos..." className={inputClass} value={medicamentos.otros} onChange={e => setMedicamentos({ ...medicamentos, otros: e.currentTarget.value })} disabled={isAdmin} />
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* 5. ESTADO NEUROLÓGICO [cite: 48-59] */}
-          <div className={cardClass}>
-            <div className={sectionTitle}>Estado Neurológico</div>
-            <div className="space-y-4">
-              <Checkbox label="Brillante Normal" checked={estadoNeuro.brillante} onChange={v => setEstadoNeuro({ ...estadoNeuro, brillante: v })} />
-              <Checkbox label="Confusión Crónica" checked={estadoNeuro.confusion} onChange={v => setEstadoNeuro({ ...estadoNeuro, confusion: v })} />
-              <Checkbox label="Déficits Preexistentes" checked={estadoNeuro.deficits} onChange={v => setEstadoNeuro({ ...estadoNeuro, deficits: v })} />
-              <div className="h-px bg-gray-200 w-full my-2"></div>
-              <Checkbox label="Autónomo" checked={estadoNeuro.autonomo} onChange={v => setEstadoNeuro({ ...estadoNeuro, autonomo: v })} />
-              <Checkbox label="Parcialmente Dependiente" checked={estadoNeuro.parcialmenteDependiente} onChange={v => setEstadoNeuro({ ...estadoNeuro, parcialmenteDependiente: v })} />
-              <Checkbox label="No Autónomo / Asistido" checked={estadoNeuro.noAutonomo} onChange={v => setEstadoNeuro({ ...estadoNeuro, noAutonomo: v })} />
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMNA 3 */}
-        <div className="space-y-6 flex flex-col">
-          {/* 3. PATOLOGÍAS [cite: 17-37] */}
-          <div className={cardClass}>
-            <div className={sectionTitle}>Patologías</div>
-            <div className="space-y-4">
-              <Checkbox label="Ninguna" checked={patologias.cardiopatia === false && patologias.diabetes === false && patologias.asma === false && patologias.epoc === false && patologias.insuficienciaRenal === false && patologias.trastornosCoagulacion === false && patologias.trasplantes === false && patologias.inmunodepresion === false && patologias.otro === ''} onChange={() => setPatologias({ cardiopatia: false, diabetes: false, diabetesTipo1: false, diabetesTipo2: false, asma: false, epoc: false, insuficienciaRenal: false, trastornosCoagulacion: false, trasplantes: false, inmunodepresion: false, otro: '' })} />
-              <Checkbox label="Cardiopatía" checked={patologias.cardiopatia} onChange={v => setPatologias({ ...patologias, cardiopatia: v })} />
-
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
-                <Checkbox label="Diabetes" checked={patologias.diabetes} onChange={v => setPatologias({ ...patologias, diabetes: v })} />
-                {patologias.diabetes && (
-                  <div className="ml-8 mt-3 flex gap-4">
-                    <Checkbox label="Tipo 1" checked={patologias.diabetesTipo1} onChange={v => setPatologias({ ...patologias, diabetesTipo1: v })} />
-                    <Checkbox label="Tipo 2" checked={patologias.diabetesTipo2} onChange={v => setPatologias({ ...patologias, diabetesTipo2: v })} />
-                  </div>
-                )}
-              </div>
-
-              <Checkbox label="Asma" checked={patologias.asma} onChange={v => setPatologias({ ...patologias, asma: v })} />
-              <Checkbox label="EPOC" checked={patologias.epoc} onChange={v => setPatologias({ ...patologias, epoc: v })} />
-              <Checkbox label="Insuficiencia Renal" checked={patologias.insuficienciaRenal} onChange={v => setPatologias({ ...patologias, insuficienciaRenal: v })} />
-              <Checkbox label="Trastornos Coagulación" checked={patologias.trastornosCoagulacion} onChange={v => setPatologias({ ...patologias, trastornosCoagulacion: v })} />
-              <Checkbox label="Trasplantes" checked={patologias.trasplantes} onChange={v => setPatologias({ ...patologias, trasplantes: v })} />
-              <Checkbox label="Inmunodepresión" checked={patologias.inmunodepresion} onChange={v => setPatologias({ ...patologias, inmunodepresion: v })} />
-              <input type="text" placeholder="Otra patología..." className={inputClass} value={patologias.otro} onChange={e => setPatologias({ ...patologias, otro: e.currentTarget.value })} disabled={isAdmin} />
-            </div>
-          </div>
-        </div>
-
-      </div> {/* FIN DEL GRID DE 3 COLUMNAS */}
-
-      {/* BLOQUE INFERIOR: Voluntades y Contactos ocupan todo el ancho */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* 6. DOCUMENTO DE VOLUNTADES [cite: 65-71] */}
-        <div className={cardClass}>
-          <div className={sectionTitle}>Documentos de Voluntades Anticipadas</div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Nombre</label>
-              <input type="text" className={inputClass} value={personalData.nombre} onChange={e => setPersonalData({ ...personalData, nombre: e.currentTarget.value })} disabled={isAdmin} />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Primer Apellido</label>
-              <input type="text" className={inputClass} value={personalData.apellido1} onChange={e => setPersonalData({ ...personalData, apellido1: e.currentTarget.value })} disabled={isAdmin} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Segundo Apellido</label>
-              <input type="text" className={inputClass} value={personalData.apellido2} onChange={e => setPersonalData({ ...personalData, apellido2: e.currentTarget.value })} disabled={isAdmin} />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Idioma</label>
-              <input type="text" className={inputClass} value={personalData.idioma} onChange={e => setPersonalData({ ...personalData, idioma: e.currentTarget.value })} disabled={isAdmin} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Sexo Biológico</label>
-              <div className="flex gap-4 mt-2">
-                <Checkbox label="Masculino" checked={personalData.sexo === 'Masculino'} onChange={() => setPersonalData({ ...personalData, sexo: 'Masculino' })} />
-                <Checkbox label="Femenino" checked={personalData.sexo === 'Femenino'} onChange={() => setPersonalData({ ...personalData, sexo: 'Femenino' })} />
-              </div>
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Tipo de Sangre</label>
-              <select className={inputClass} value={personalData.sangre} onChange={e => setPersonalData({ ...personalData, sangre: e.currentTarget.value })} disabled={isAdmin}>
-                <option value="A+">A+</option><option value="A-">A-</option>
-                <option value="B+">B+</option><option value="B-">B-</option>
-                <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                <option value="O+">O+</option><option value="O-">O-</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Aviso de Contactos [cite: 72-74] */}
-          {!isAdmin && (
-            <div className="mt-2 text-[10px] text-gray-500 italic">
-              Declaro haber informado al contacto de emergencia indicado y haber obtenido su consentimiento para ser contactado exclusivamente en caso de necesidad sanitaria.
-            </div>
-          )}
-        </div>
-
-        {/* 7. CONTACTOS DE EMERGENCIA [cite: 75] */}
-        <div className={cardClass}>
-          <div className={sectionTitle}>Contactos de Emergencia</div>
-          {contacts.map((c, i) => (
-            <div key={i} className={`space-y-3 ${i > 0 ? 'mt-6 pt-4 border-t border-gray-100' : ''}`}>
-              <p className="text-[10px] text-[#2eb0b0] font-bold uppercase tracking-wider">Contacto {i + 1}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[10px] font-bold text-gray-500 uppercase">Nombre y Apellido</label>
-                  <input type="text" className={inputClass} value={c.nombre} onChange={e => { const nc = [...contacts]; nc[i].nombre = e.currentTarget.value; setContacts(nc); }} disabled={isAdmin} />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold text-gray-500 uppercase">Vínculo</label>
-                  <input type="text" className={inputClass} value={c.vinculo} onChange={e => { const nc = [...contacts]; nc[i].vinculo = e.currentTarget.value; setContacts(nc); }} disabled={isAdmin} />
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-500 uppercase">Teléfono</label>
-                <input type="text" className={inputClass} value={c.telefono} onChange={e => { const nc = [...contacts]; nc[i].telefono = e.currentTarget.value; setContacts(nc); }} disabled={isAdmin} />
-              </div>
-            </div>
-          ))}
-        </div>
-
+      {/* ADVERTENCIA LEGAL 1 */}
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-8 text-[11px] text-blue-900 text-justify leading-relaxed shadow-sm">
+        <strong>Advertencia legal:</strong> "La presente declaración expresa mi voluntad en el ámbito sanitario y está redactada en forma de autodeterminación personal. Soy consciente de que, conforme al artículo 11 de la Ley 41/2002, las Instrucciones Previas solo adquieren plena eficacia jurídica si se formalizan según la normativa de la Comunidad Autónoma correspondiente y se inscriben en el Registro oficial. Por tanto, este documento no constituye una directiva anticipada jurídicamente vinculante. No obstante, de conformidad con el artículo 9 del Convenio de Oviedo, los deseos previamente expresados deberán ser tenidos en cuenta."
       </div>
 
-      {/* BOTÓN DE GUARDADO (Solo para el Cliente) */}
-      {!isAdmin && (
-        <div className="mt-12 flex justify-center">
-          <button
-            onClick={handleSave} // ✅ AHORA SÍ LLAMA A LA API
-            className="bg-[#2eb0b0] text-white px-16 py-4 rounded-2xl font-bold hover:bg-[#269393] transition-all shadow-lg uppercase tracking-widest text-sm active:scale-95"
-          >
-            Guardar Mi Ficha Médica
-          </button>
-        </div>
-      )}
+      {/* BLOQUE 1: ALERGIAS, MEDICAMENTOS, PATOLOGÍAS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 
+        {/* ALERGIAS */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Alergias</div>
+          <Checkbox category="allergies" code="442557003" label="No known allergies" />
+        </div>
+
+        {/* MEDICAMENTOS */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Medicamentos</div>
+          <Checkbox category="medications" code="260413007" label="None" />
+          <Checkbox category="medications" code="418427003" label="Patient on anticoagulant therapy" />
+          <Checkbox category="medications" code="31252001" label="Insulin therapy" />
+          <Checkbox category="medications" code="373264003" label="Hypoglycemic agent" />
+          <Checkbox category="medications" code="387207008" label="Opioid" />
+          <Checkbox category="medications" code="387158006" label="Benzodiazepine" />
+          <Checkbox category="medications" code="386452003" label="Antiepileptic" />
+          <Checkbox category="medications" code="387081005" label="Corticosteroid" />
+        </div>
+
+        {/* PATOLOGÍAS */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Patologías</div>
+          <Checkbox category="pathologies" code="160245001" label="No current problems or disability" />
+          <Checkbox category="pathologies" code="49436004" label="Atrial fibrillation" />
+          <Checkbox category="pathologies" code="73211009" label="Diabetes mellitus" />
+          <Checkbox category="pathologies" code="195967001" label="Asthma" />
+          <Checkbox category="pathologies" code="13645005" label="Chronic obstructive lung disease" />
+          <Checkbox category="pathologies" code="709044004" label="Chronic kidney disease" />
+          <Checkbox category="pathologies" code="64770001" label="Blood coagulation disorder" />
+          <Checkbox category="pathologies" code="161661002" label="History of organ transplant" />
+          <Checkbox category="pathologies" code="370388006" label="Patient immunocompromised" />
+        </div>
+
+        {/* IMPLANTES */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Implantes</div>
+          <Checkbox category="inplantDevices" code="260413007" label="None" />
+          <Checkbox category="inplantDevices" code="14106009" label="Permanent cardiac pacemaker" />
+          <Checkbox category="inplantDevices" code="441509002" label="Implantable cardioverter defibrillator" />
+          <Checkbox category="inplantDevices" code="17137000" label="Cardiac valve prosthesis" />
+          <Checkbox category="inplantDevices" code="271295000" label="Ventricular shunt" />
+          <Checkbox category="inplantDevices" code="700448003" label="Dialysis device" />
+        </div>
+
+        {/* NEUROLÓGICO */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Estado Neurológico</div>
+          <Checkbox category="neurologicalStatus" code="40739000" label="Normal conscious state" />
+          <Checkbox category="neurologicalStatus" code="706868007" label="Chronic confused state" />
+          <Checkbox category="neurologicalStatus" code="128294001" label="Chronic nervous system disorder" />
+          <Checkbox category="neurologicalStatus" code="365061000" label="Independent in activities of daily living" />
+          <Checkbox category="neurologicalStatus" code="371153006" label="Partially dependent" />
+          <Checkbox category="neurologicalStatus" code="129839007" label="Total dependency" />
+        </div>
+      </div>
+
+      {/* BLOQUE INFERIOR: DATOS Y CONTACTOS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* DATOS PERSONALES */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Datos Identificativos</div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Nombre</label>
+                <input type="text" className={inputClass} value={formData.firstName} onInput={e => setFormData({ ...formData, firstName: e.currentTarget.value })} />
+              </div>
+            </div>
+
+            {/* APELLIDOS SEPARADOS */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Primer Apellido</label>
+                <input type="text" className={inputClass} value={formData.surname1} onInput={e => setFormData({ ...formData, surname1: e.currentTarget.value })} />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Segundo Apellido</label>
+                <input type="text" className={inputClass} value={formData.surname2} onInput={e => setFormData({ ...formData, surname2: e.currentTarget.value })} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Idioma</label>
+                <select className={inputClass} value={formData.language} onChange={e => setFormData({ ...formData, language: e.currentTarget.value })}>
+                  <option value="ES">ES</option>
+                  <option value="EN">EN</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Sexo</label>
+                <select className={inputClass} value={formData.biologicalSex} onChange={e => setFormData({ ...formData, biologicalSex: e.currentTarget.value })}>
+                  <option value="M">M</option>
+                  <option value="F">F</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Sangre</label>
+                <select className={inputClass} value={formData.bloodType} onChange={e => setFormData({ ...formData, bloodType: e.currentTarget.value })}>
+                  <option value="O+">O+</option><option value="O-">O-</option>
+                  <option value="A+">A+</option><option value="A-">A-</option>
+                  <option value="B+">B+</option><option value="B-">B-</option>
+                  <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CONTACTOS Y AVISO 2 */}
+        <div className={cardClass}>
+          <div className={sectionTitle}>Contactos de Emergencia</div>
+          <div className="space-y-4">
+            {formData.emergencyContacts.map((c, i) => (
+              <div key={i} className="flex gap-2">
+                <input type="text" placeholder="Nombre" className={inputClass} value={c.nombre} onInput={e => {
+                  const newC = [...formData.emergencyContacts];
+                  newC[i].nombre = e.currentTarget.value;
+                  setFormData({ ...formData, emergencyContacts: newC });
+                }} />
+                <input type="text" placeholder="Teléfono" className={inputClass} value={c.telefono} onInput={e => {
+                  const newC = [...formData.emergencyContacts];
+                  newC[i].telefono = e.currentTarget.value;
+                  setFormData({ ...formData, emergencyContacts: newC });
+                }} />
+              </div>
+            ))}
+            <div className="bg-gray-50 p-4 rounded-xl text-[9px] text-gray-500 text-justify leading-snug border border-gray-100">
+              "Declaro haber informado al contacto de emergencia indicado y haber obtenido su consentimiento para ser contactado exclusivamente en caso de necesidad sanitaria... de conformidad con el Reglamento (UE) 2016/679 y la Ley Orgánica 3/2018."
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-12 flex justify-center">
+        <button onClick={handleSave} className="bg-[#2eb0b0] text-white px-20 py-4 rounded-2xl font-bold hover:bg-[#269393] shadow-lg transition-all active:scale-95 uppercase tracking-widest text-xs">
+          Actualizar Mi Ficha Médica
+        </button>
+      </div>
     </div>
   );
 }

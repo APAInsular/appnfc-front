@@ -31,7 +31,10 @@ export const ALL: APIRoute = async ({ request, params, cookies }) => {
 
     const res = await fetch(backendUrl, {
       method: request.method,
-      headers: headers,
+      headers: {
+        ...headers,
+        "Authorization": `Bearer ${token}` // Esto inyecta el token de la cookie al backend
+      },
       body: requestBody,
     });
 
@@ -39,9 +42,9 @@ export const ALL: APIRoute = async ({ request, params, cookies }) => {
 
     if (!res.ok) {
       console.log(`❌ ERROR DEL BACKEND EN ${path}:`);
-      console.log(responseText); 
+      console.log(responseText);
     }
-    
+
     let data;
     try {
       data = JSON.parse(responseText);
