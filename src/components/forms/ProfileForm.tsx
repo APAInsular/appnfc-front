@@ -282,7 +282,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "" }) {
                   <option value="F">F</option>
                 </select>
               </div>
-              <div>
+              {/* <div>
                 <label className="text-[10px] font-bold text-gray-500 uppercase">Sangre</label>
                 <select className={inputClass} value={formData.bloodType} onChange={e => setFormData({ ...formData, bloodType: e.currentTarget.value })}>
                   <option value="O+">O+</option><option value="O-">O-</option>
@@ -290,7 +290,7 @@ export default function ProfileForm({ isAdmin = false, patientName = "" }) {
                   <option value="B+">B+</option><option value="B-">B-</option>
                   <option value="AB+">AB+</option><option value="AB-">AB-</option>
                 </select>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

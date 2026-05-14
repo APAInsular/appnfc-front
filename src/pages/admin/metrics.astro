@@ -8,17 +8,17 @@ const title = "Metricas";
 ---
 
 <BaseLayout title="Panel de Control - Q-Vida">
-  <div class="flex min-h-screen bg-[#1c1c1c] font-sans">
+  <div class="flex min-h-screen bg-[#f8f9fa] font-sans">
     
     <Sidebar />
 
-    <main class="flex-1 bg-[#1c1c1c] p-6 overflow-y-auto">
+    <main class="flex-1 bg-[#f8f9fa] p-6 overflow-y-auto">
       
       <div class="bg-transparent h-full rounded-[40px] flex flex-col">
         
         <div class="flex justify-between items-center mb-10 px-4">
-          <h1 class="text-2xl font-semibold text-white">{title}</h1>
-          <div class="h-[1px] flex-grow mx-8 bg-gray-800"></div>
+          <h1 class="text-2xl font-semibold text-gray-800">{title}</h1>
+          <div class="h-[1px] flex-grow mx-8 bg-gray-200"></div>
           <img src="/img/Logo_Qvida.png" alt="Logo" class="h-10 w-auto" />
         </div>
 
@@ -47,20 +47,20 @@ const title = "Metricas";
           />
         </div>
 
-        <div class="bg-[#242424] p-8 rounded-2xl shadow-lg border border-white/5">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           <div class="flex items-center gap-3 mb-8">
             <Icon name="heroicons:bell" class="w-6 h-6 text-[#f59e0b]" />
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Gestión de Incidencias</h3>
+            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Gestión de Incidencias</h3>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-[#2a2a2a] p-6 rounded-2xl border-l-4 border-red-500 text-center">
-              <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Incidencias Abiertas</p>
-              <span class="text-5xl font-bold text-white">42</span>
+            <div class="bg-[#fcfcfc] p-6 rounded-2xl border border-gray-100 border-l-4 border-l-red-500 text-center">
+              <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Incidencias Abiertas</p>
+              <span class="text-5xl font-bold text-gray-800">42</span>
             </div>
-            <div class="bg-[#2a2a2a] p-6 rounded-2xl border-l-4 border-green-500 text-center">
-              <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Incidencias Cerradas</p>
-              <span class="text-5xl font-bold text-white">156</span>
+            <div class="bg-[#fcfcfc] p-6 rounded-2xl border border-gray-100 border-l-4 border-l-green-500 text-center">
+              <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Incidencias Cerradas</p>
+              <span class="text-5xl font-bold text-gray-800">156</span>
             </div>
           </div>
         </div>
