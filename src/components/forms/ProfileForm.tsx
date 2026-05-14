@@ -177,11 +177,6 @@ export default function ProfileForm({ isAdmin = false, patientName = "" }) {
         </div>
       </div>
 
-      {/* ADVERTENCIA LEGAL 1 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-8 text-[11px] text-blue-900 text-justify leading-relaxed shadow-sm">
-        <strong>Advertencia legal:</strong> "La presente declaración expresa mi voluntad en el ámbito sanitario y está redactada en forma de autodeterminación personal. Soy consciente de que, conforme al artículo 11 de la Ley 41/2002, las Instrucciones Previas solo adquieren plena eficacia jurídica si se formalizan según la normativa de la Comunidad Autónoma correspondiente y se inscriben en el Registro oficial. Por tanto, este documento no constituye una directiva anticipada jurídicamente vinculante. No obstante, de conformidad con el artículo 9 del Convenio de Oviedo, los deseos previamente expresados deberán ser tenidos en cuenta."
-      </div>
-
       {/* BLOQUE 1: ALERGIAS, MEDICAMENTOS, PATOLOGÍAS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 
@@ -239,6 +234,11 @@ export default function ProfileForm({ isAdmin = false, patientName = "" }) {
           <Checkbox category="neurologicalStatus" code="371153006" label="Partially dependent" />
           <Checkbox category="neurologicalStatus" code="129839007" label="Total dependency" />
         </div>
+      </div>
+
+            {/* ADVERTENCIA LEGAL 1 */}
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-8 text-[11px] text-blue-900 text-justify leading-relaxed shadow-sm">
+        <strong>Advertencia legal:</strong> "La presente declaración expresa mi voluntad en el ámbito sanitario y está redactada en forma de autodeterminación personal. Soy consciente de que, conforme al artículo 11 de la Ley 41/2002, las Instrucciones Previas solo adquieren plena eficacia jurídica si se formalizan según la normativa de la Comunidad Autónoma correspondiente y se inscriben en el Registro oficial. Por tanto, este documento no constituye una directiva anticipada jurídicamente vinculante. No obstante, de conformidad con el artículo 9 del Convenio de Oviedo, los deseos previamente expresados deberán ser tenidos en cuenta."
       </div>
 
       {/* BLOQUE INFERIOR: DATOS Y CONTACTOS */}
