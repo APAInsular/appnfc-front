@@ -3,10 +3,9 @@ import { login } from "../../stores/session.store";
 
 const ROLE_ROUTES: Record<string, string> = {
     Admin: "/admin/metrics",
-    Patient: "/client/profile",
+    Patient: "/client/consent", // <-- Cambias /client/profile por este nuevo archivo
     Practitioner: "/practitioner/dashboard",
 };
-
 export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -26,7 +25,7 @@ export default function LoginForm() {
         }
 
         const user = await res.json();
-        
+
 
         // --- LA SOLUCIÓN ESTÁ AQUÍ ---
         // 1. Guardamos el token explícitamente para que ProfileForm lo encuentre

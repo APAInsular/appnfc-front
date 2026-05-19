@@ -1,0 +1,229 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const title = "Consentimiento Informado - Q-Vida";
+---
+
+<BaseLayout title={title}>
+  <div class="min-h-screen bg-[#f8f9fa] font-sans flex flex-col justify-between py-10 px-4 md:px-8">
+    
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 w-full">
+      
+      <div class="flex flex-col md:flex-row justify-between items-center border-b border-gray-100 pb-6 mb-8 gap-4">
+        <div>
+          <span class="text-[10px] font-bold text-[#2eb0b0] uppercase tracking-widest block mb-1">PROGRAMA PULSERA MÉDICA</span>
+          <h1 class="text-xl md:text-2xl font-bold text-gray-800 uppercase tracking-tight">MÓDULO DE CONSENTIMIENTO INFORMADO</h1>
+        </div>
+        <img src="/img/Logo_Qvida.png" alt="Logo Q-Vida" class="h-10 w-auto" />
+      </div>
+
+      <div class="space-y-6 text-sm text-gray-600 leading-relaxed max-h-[50vh] overflow-y-auto pr-2 border-b border-gray-100 pb-8 mb-8 custom-scrollbar">
+        
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">1. NATURALEZA DEL TRATAMIENTO DE DATOS</h2>
+          <p>Esta declaración explica cómo sus datos sanitarios personales serán recopilados, almacenados, gestionados y compartidos en el contexto del programa de Pulsera Médica QVIDA.</p>
+          <p class="mt-2 font-medium text-gray-700">La información que proporcione es esencial para garantizar que los servicios de emergencia (112) tengan acceso a sus datos médicos críticos en caso de necesidad, con el fin de salvaguardar su vida y su salud.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">2. RESPONSABLES DEL TRATAMIENTO</h2>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>Titular del Tratamiento (Responsable Principal):</strong> Servicio Canario de Salud (Dirección General de Salud Pública, Islas Canarias).</li>
+            <li><strong>Responsable de la Protección de Datos (DPO):</strong> Disponible en la Dirección Regional de Salud Pública, o contactable en: <span class="text-[#2eb0b0]">dpo@canarias.es</span></li>
+            <li><strong>Proveedor Técnico (Procesador de Datos):</strong> Medilab Services Canarias – Actúa exclusivamente bajo las instrucciones del Servicio Canario de Salud.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">3. QUÉ DATOS PERSONALES RECOPILAREMOS</h2>
+          <p class="mb-3">Consentimos explícitamente la recopilación y el tratamiento de los siguientes datos sanitarios:</p>
+          
+          <div class="overflow-x-auto border border-gray-100 rounded-xl">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                  <th class="p-3 font-bold text-gray-700 uppercase w-1/3">Tipo de dato</th>
+                  <th class="p-3 font-bold text-gray-700 uppercase">Descripción y finalidad</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr>
+                  <td class="p-3 font-semibold text-gray-800">Alergias conocidas</td>
+                  <td class="p-3">Previene reacciones anafilácticas e incompatibilidades farmacológicas críticas.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-gray-800">Fármacos actuales</td>
+                  <td class="p-3">Dosificación y frecuencia para evitar interacciones dañinas durante intervenciones.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-gray-800">Condiciones médicas crónicas</td>
+                  <td class="p-3">Ej. diabetes, hipertensión, insuficiencia cardíaca, epilepsia - fundamentales para diagnóstico rápido.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-gray-800">Contactos de emergencia</td>
+                  <td class="p-3">Nombre, número telefónico de familiares o tutores legales.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-gray-800">Datos identificativos</td>
+                  <td class="p-3">Nombre completo, fecha de nacimiento, número de identidad (DNI), dirección.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">4. CON QUIÉN COMPARTIREMOS SUS DATOS</h2>
+          <p>Sus datos sanitarios serán accesibles a:</p>
+          <ul class="list-disc pl-5 space-y-1 mt-1">
+            <li><strong>Central Operativa del 112:</strong> En caso de emergencia médica. Los operadores accederán a los datos para proporcionar ayuda apropiada.</li>
+            <li><strong>Personal Médico y Paramédico:</strong> Ambulancias, hospitales, departamentos de urgencias que intervienen.</li>
+            <li><strong>Sistema Sanitario Público Canario:</strong> Hospitales e instalaciones de la Isla.</li>
+            <li><strong>Ningún otro:</strong> Los datos NO serán vendidos, cedidos con fines publicitarios, o compartidos con aseguradoras sin nuevo consentimiento explícito.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">5. SUS DERECHOS CONFORME AL RGPD</h2>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>Derecho de Acceso:</strong> Puede solicitar ver qué datos personales se almacenan sobre usted.</li>
+            <li><strong>Derecho de Rectificación:</strong> Puede solicitar corregir datos inexactos o incompletos.</li>
+            <li><strong>Derecho de Eliminación (Derecho al Olvido):</strong> Puede solicitar la eliminación de sus datos, salvo obligaciones legales o interés vital en curso.</li>
+            <li><strong>Derecho de Limitación del Tratamiento:</strong> Puede solicitar la congelación temporal de sus datos.</li>
+            <li><strong>Derecho de Retirar el Consentimiento:</strong> Puede retirar su consentimiento en cualquier momento sin penalidad, contactando al DPO.</li>
+            <li><strong>Derecho de Reclamación:</strong> Si considera que sus derechos han sido violados, puede presentar una reclamación ante la Autoridad de Protección de Datos de España (AEPD | www.aepd.es | Teléfono: 901 10 65 56).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">6. CUÁNTO TIEMPO CONSERVAREMOS SUS DATOS</h2>
+          <p>Sus datos sanitarios se conservarán durante toda su vida y durante los 2 años siguientes, de conformidad con la normativa sanitaria española (Ley Orgánica de Protección de Datos). Después de este período serán eliminados de manera segura. En caso de fallecimiento, los datos podrán ser conservados para fines de investigación médica con el consentimiento de la familia, o eliminados bajo solicitud.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">7. MEDIDAS DE SEGURIDAD</h2>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Cifrado de extremo a extremo durante la transmisión y el almacenamiento.</li>
+            <li>Autenticación para el personal que accede a los datos.</li>
+            <li>Registros de acceso permanentes: cada acceso se registra con fecha, hora e identidad del operador.</li>
+            <li>Copias de seguridad georeferenciadas en al menos 2 ubicaciones diferentes.</li>
+            <li>Pruebas de seguridad anuales (pruebas de penetración) por expertos independientes.</li>
+            <li>Plan de respuesta ante violaciones: en caso de compromiso, será notificado dentro de 72 horas.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">8. RIESGOS Y BENEFICIOS</h2>
+          <p><strong>Beneficios:</strong> Intervención médica más rápida e informada en emergencia; Reducción de errores diagnósticos debido a información incompleta; Probabilidad significativamente mayor de supervivencia en caso de infarto, accidente cerebrovascular, anafilaxia.</p>
+          <p class="mt-1"><strong>Riesgos (minimizados pero reconocidos):</strong> Posible acceso no autorizado a los datos; Uso indebido de información sanitaria por parte de terceros; Pérdida accidental de datos en caso de error humano o catástrofe tecnológica.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">9. DECLARACIÓN DE CONSENTIMIENTO EXPLÍCITO</h2>
+          <p>Declaro haber leído y comprendido completamente este módulo de consentimiento informado en español, mi lengua de comprensión.</p>
+          <p class="font-medium mt-1">Comprendo que:</p>
+          <ul class="list-disc pl-5 space-y-1 mt-1">
+            <li>Mis datos sanitarios son sensibles y protegidos por leyes especiales (RGPD).</li>
+            <li>Libre y voluntariamente autorizo al Servicio Canario de Salud y al proveedor de la pulsera a recopilar, archivar y compartir mi información médica.</li>
+            <li>Puedo retirar este consentimiento en cualquier momento escribiendo al DPO (dpo@canarias.es).</li>
+            <li>Mi consentimiento está condicionado al uso EXCLUSIVO para fines de emergencia médica y rescate.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">10. PARA MÁS INFORMACIÓN O PARA EJERCER SUS DERECHOS</h2>
+          <p><strong>DPO:</strong> dpo@canarias.es | Dirección del Servicio Canario de Salud</p>
+          <p><strong>AEPD:</strong> www.aepd.es | C/ Jorge Juan, 6 - 28001 Madrid, España</p>
+          <p class="text-[11px] text-gray-400 mt-2 italic">Este documento constituye un acuerdo legalmente vinculante conforme al RGPD (Reglamento UE 2016/679). Versión: 1.0 | Fecha de Emisión: Marzo 2026</p>
+        </section>
+      </div>
+
+      <form id="consentForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Nombre y Apellido (En Mayúsculas)</label>
+            <input 
+              type="text" 
+              id="patientName" 
+              required 
+              placeholder="EJ: MERE CUM BE" 
+              class="w-full bg-[#f8f9fa] border border-gray-100 rounded-xl py-3 px-4 text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#2eb0b0] focus:bg-white outline-none transition-all uppercase"
+            />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Fecha de Firma</label>
+            <input 
+              type="text" 
+              id="signDate" 
+              readonly 
+              class="w-full bg-[#f8f9fa] border border-gray-100 rounded-xl py-3 px-4 text-sm text-gray-500 outline-none"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <input 
+            type="checkbox" 
+            id="acceptCheck" 
+            required 
+            class="mt-1 w-4 h-4 text-[#2eb0b0] border-gray-300 rounded focus:ring-[#2eb0b0]"
+          />
+          <label for="acceptCheck" class="text-xs text-gray-600 font-medium">
+            Doy mi consentimiento libre, específico, informado e inequívoco para el tratamiento de mis datos de salud bajo los términos descritos en este documento.
+          </label>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button 
+            type="submit" 
+            class="bg-[#2eb0b0] hover:bg-[#269393] text-white font-bold py-3.5 px-8 rounded-xl text-sm shadow-md transition-all active:scale-95 flex items-center gap-2"
+          >
+            Confirmar y Continuar al Formulario Médico
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Scrollbar elegante para el documento legal */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2eb0b0;
+  }
+</style>
+
+<script>
+  // Autocompletar la fecha de hoy al cargar
+  const dateInput = document.getElementById('signDate') as HTMLInputElement;
+  if (dateInput) {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    dateInput.value = `${day}/${month}/${year}`;
+  }
+
+  // Manejar el envío del formulario
+  const form = document.getElementById('consentForm');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Marcamos en LocalStorage que ya aceptó los términos por si necesitas consultarlo más adelante
+    localStorage.setItem('has_accepted_consent', 'true');
+
+    // Redirección inmediata a la ficha médica
+    window.location.href = '/client/profile';
+  });
+</script>

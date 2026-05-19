@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import ProfileForm from "../../components/forms/ProfileForm";
+// src/pages/client/profile.astro
+import Layout from '../../layouts/BaseLayout.astro';
+import ProfileForm from '../../components/forms/ProfileForm';
 ---
 
-<BaseLayout title="Mis Datos - Q-Vida Care">
-  <ProfileForm client:load />
-</BaseLayout>
-
+<Layout title="Mi Perfil">
+  <ProfileForm client:only="preact" />
+</Layout>

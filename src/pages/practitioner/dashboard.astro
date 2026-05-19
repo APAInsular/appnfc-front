@@ -1,0 +1,15 @@
+---
+// src/pages/practitioner/dashboard.astro
+import Layout from '../../layouts/BaseLayout.astro';
+import PractitionerDashboardComponent from '../../components/practitioner/PractitionerDashboard';
+import PractitionerPatientForm from '../../components/forms/PractitionerPatientForm';
+---
+
+<Layout title="Dashboard de Facultativo">
+  <PractitionerDashboardComponent client:load />
+  <div class="container mx-auto py-6">
+    
+    <section class="mt-8">
+      <PractitionerPatientForm client:load />
+    </section>
+</Layout>
